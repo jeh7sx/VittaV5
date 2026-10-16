@@ -1,0 +1,70 @@
+export const styles = {
+  container: {
+    flex: 1,
+    flexDirection: 'row' as const,
+    backgroundColor: '#F5F5F5',
+    minHeight: '100%',
+  },
+  contentWrapper: {
+    flex: 1,
+    padding: 28,
+  },
+  card: {
+    width: '100%',
+    maxWidth: 780,
+    backgroundColor: '#FFF',
+    borderRadius: 14,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  titulo: {
+    fontSize: 20,
+    fontWeight: '800' as const,
+    color: '#1A1A1A',
+    marginBottom: 12,
+  },
+  grupo: {
+    marginBottom: 12,
+  },
+  label: {
+    fontSize: 12,
+    color: '#555',
+    marginBottom: 6,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#E6E6E6',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: '#FFF',
+  },
+  acoes: {
+    marginTop: 18,
+    flexDirection: 'row' as const,
+    gap: 10,
+  },
+  botaoPrimario: {
+    backgroundColor: '#F4B000',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center' as const,
+  },
+  botaoTexto: {
+    color: '#111',
+    fontWeight: '700' as const,
+  },
+  botaoSecundario: {
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#E6E6E6',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center' as const,
+  },
+};

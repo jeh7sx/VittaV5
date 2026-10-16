@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "Vitta",
+    "slug": "vitta",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./img/logo.png",
+    "scheme": "vitta",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "icon": "./img/logo.png"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./img/logo.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./img/logo.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#208AEF",
+          "android": {
+            "image": "./assets/images/splash-icon.png",
+            "imageWidth": 76
+          }
+        }
+      ],
+      "expo-font",
+      "@react-native-community/datetimepicker"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

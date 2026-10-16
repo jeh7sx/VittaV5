@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Fundo Circular Preto -->
+  <circle cx="50" cy="50" r="48" fill="#111111" />
+
+  <!-- Letra "v" branca com cantos suaves -->
+  <path d="M30 38 L43 65 C44 67 46 67 47 65 L60 38" 
+        fill="none" 
+        stroke="#FFFFFF" 
+        stroke-width="9" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+
+  <!-- Centelha / Spark de IA no lugar do ponto (Amarelo Vitta) -->
+  <path d="M68 62 C68 57 73 57 73 57 C73 57 68 57 68 52 C68 57 63 57 63 57 C63 57 68 57 68 62 Z" 
+        fill="#F7B500" />
+</svg>
