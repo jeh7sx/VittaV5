@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import {
   ActivityIndicator,
   Alert,
@@ -10,6 +9,7 @@ import {
   TouchableOpacity,
   View,
   useWindowDimensions,
+  Pressable,  
 } from 'react-native';
 import { colors } from '@/styles/colors';
 import { tipografia } from '@/styles/tipografia';
@@ -260,46 +260,63 @@ export default function UsuariosAdmin() {
                 </View>
               </View>
 
-              {modalFiltroVisivel && typeof document !== 'undefined'
-                ? ReactDOM.createPortal(
-                    <>
-                      <div onClick={() => setModalFiltroVisivel(false)} style={{ position: 'fixed', inset: 0, zIndex: 2147483646, backgroundColor: 'transparent' }} />
-                      <div
-                        style={{
-                          position: 'fixed',
-                          top: filtroPos?.top ?? 100,
-                          left: filtroPos?.left ?? Math.max(8, window.innerWidth - 220 - 8),
-                          minWidth: 200,
-                          backgroundColor: '#FFFFFF',
-                          borderRadius: 12,
-                          border: '1px solid #EAEAEA',
-                          padding: '6px 0',
-                          boxShadow: '0px 8px 16px rgba(0,0,0,0.12)',
-                          zIndex: 2147483647,
-                          pointerEvents: 'auto',
-                        }}
-                      >
-                        {OPCOES_FILTRO.map((opcao) => (
-                          <div
-                            key={opcao.valor}
-                            onClick={() => {
-                              setFiltroStatus(opcao.valor);
-                              setModalFiltroVisivel(false);
-                            }}
+              {modalFiltroVisivel && (
+                <Modal
+                  transparent
+                  animationType="none"
+                  visible={modalFiltroVisivel}
+                  onRequestClose={() => setModalFiltroVisivel(false)}
+                >
+                  <Pressable
+                    style={{ flex: 1, backgroundColor: 'transparent' }}
+                    onPress={() => setModalFiltroVisivel(false)}
+                  >
+                    <View
+                      style={{
+                        position: 'absolute',
+                        top: filtroPos?.top ?? 100,
+                        left: filtroPos?.left ?? 20,
+                        minWidth: 200,
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: 12,
+                        borderWidth: 1,
+                        borderColor: '#EAEAEA',
+                        paddingVertical: 6,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: 0.12,
+                        shadowRadius: 10,
+                        elevation: 8,
+                      }}
+                    >
+                      {OPCOES_FILTRO.map((opcao) => (
+                        <TouchableOpacity
+                          key={opcao.valor}
+                          onPress={() => {
+                            setFiltroStatus(opcao.valor);
+                            setModalFiltroVisivel(false);
+                          }}
+                          style={{
+                            paddingVertical: 10,
+                            paddingHorizontal: 14,
+                            backgroundColor: filtroStatus === opcao.valor ? '#FFF8E1' : 'transparent',
+                          }}
+                        >
+                          <Text
                             style={{
-                              padding: '10px 14px',
-                              backgroundColor: filtroStatus === opcao.valor ? '#FFF8E1' : 'transparent',
-                              cursor: 'pointer',
+                              fontSize: 13,
+                              fontWeight: filtroStatus === opcao.valor ? '700' : '500',
+                              color: filtroStatus === opcao.valor ? '#8A5B00' : '#444',
                             }}
                           >
-                            <span style={{ fontSize: 13, fontWeight: filtroStatus === opcao.valor ? 700 : 500, color: filtroStatus === opcao.valor ? '#8A5B00' : '#444' }}>{opcao.rotulo}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </>,
-                    document.body,
-                  )
-                : null}
+                            {opcao.rotulo}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </Pressable>
+                </Modal>
+              )}
             </View>
 
             {/* Lista de usuários */}
@@ -639,11 +656,11 @@ function ModalGerenciarUsuario({
           <ScrollView style={{ maxHeight: 400 }} showsVerticalScrollIndicator={false}>
             {abaAtiva === 'visualizar' && (
               <View style={{ gap: 14 }}>
-                <Field label="Nome" valor={usuario.nome} onChangeText={() => {}} editavel={false} />
-                <Field label="E-mail" valor={usuario.email} onChangeText={() => {}} editavel={false} />
-                <Field label="Data de criação da conta" valor={usuario.criadoEm ?? '—'} onChangeText={() => {}} editavel={false} />
-                <Field label="Nascimento" valor={usuario.dataNascimento || '—'} onChangeText={() => {}} editavel={false} />
-                <Field label="CPF" valor={aplicarMascaraCPF(usuario.cpf)} onChangeText={() => {}} editavel={false} />
+                <Field label="Nome" valor={usuario.nome} onChangeText={() => { }} editavel={false} />
+                <Field label="E-mail" valor={usuario.email} onChangeText={() => { }} editavel={false} />
+                <Field label="Data de criação da conta" valor={usuario.criadoEm ?? '—'} onChangeText={() => { }} editavel={false} />
+                <Field label="Nascimento" valor={usuario.dataNascimento || '—'} onChangeText={() => { }} editavel={false} />
+                <Field label="CPF" valor={aplicarMascaraCPF(usuario.cpf)} onChangeText={() => { }} editavel={false} />
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <Text style={tipografia.body}>Status atual:</Text>
                   <Badge status={usuario.status} />
@@ -655,9 +672,9 @@ function ModalGerenciarUsuario({
               <View style={{ gap: 14 }}>
                 <Field label="Nome" valor={nome} onChangeText={setNome} editavel={true} />
                 <Field label="E-mail" valor={email} onChangeText={setEmail} editavel={true} />
-                <Field label="Data de criação da conta" valor={usuario.criadoEm ?? '—'} onChangeText={() => {}} editavel={false} />
-                <Field label="Nascimento" valor={usuario.dataNascimento || '—'} onChangeText={() => {}} editavel={false} />
-                <Field label="CPF" valor={aplicarMascaraCPF(usuario.cpf)} onChangeText={() => {}} editavel={false} />
+                <Field label="Data de criação da conta" valor={usuario.criadoEm ?? '—'} onChangeText={() => { }} editavel={false} />
+                <Field label="Nascimento" valor={usuario.dataNascimento || '—'} onChangeText={() => { }} editavel={false} />
+                <Field label="CPF" valor={aplicarMascaraCPF(usuario.cpf)} onChangeText={() => { }} editavel={false} />
 
                 <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10 }}>
                   <ButtonPrimary
