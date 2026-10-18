@@ -18,7 +18,6 @@ import { auth, db } from '../services/firebase';
 import { registrarLog } from '../utils/logs';
 import { criarNotificacao } from '../utils/notificacao';
 import { useHeaderSearch } from './useHeaderSearch';
-import * as Notifications from 'expo-notifications';
 
 export type StatusMedicamento = 'Ativo' | 'Concluído' | 'Atrasado';
 
@@ -165,14 +164,12 @@ export function calcularStatusDinamico(med: {
   const totalDoses = doses.length;
   const dosesTomadasCount = (med.dosesTomadas || []).length;
 
-  // 1. Todas as doses tomadas: Concluído (independente do prazo)
   if (totalDoses > 0 && dosesTomadasCount >= totalDoses) {
     return 'Concluído';
   }
 
   const agora = new Date();
 
-  // 2. Verifica se passou do prazo final (se houver dataTermino ou última dose programada)
   if (med.dataTermino) {
     const [dT, mT, aT] = med.dataTermino.split('/').map(Number);
     const prazoFinal = new Date(aT, mT - 1, dT, 23, 59, 59, 999);
@@ -319,7 +316,6 @@ export function useMedicamentos() {
             dosesTomadas: data.dosesTomadas ?? [],
           };
 
-          // Avalia as doses tomadas e prazos dinamicamente
           const statusCalculado = calcularStatusDinamico(baseMed);
 
           return {
@@ -623,35 +619,16 @@ export function useMedicamentos() {
     }
   }, [usuario?.uid, filhoSelecionado, nome, tipo, dosagem, frequencia, horario, dataInicio, dataTermino, hospital, hospitalPlaceId, hospitalLat, hospitalLng, statusForm, fotosForm, limparFormCadastro]);
 
-  async function agendarNotificacoes(nomeMedicamento: string, dtInicio: string, dtTermino: string, hrInicio: string, freqQtd: number, freqUnidade: string) {
-    let horasDeIntervalo = 0;
-    if (freqUnidade === 'Horas') horasDeIntervalo = freqQtd;
-    else if (freqUnidade === 'Dias') horasDeIntervalo = freqQtd * 24;
-    else if (freqUnidade === 'Semanas') horasDeIntervalo = freqQtd * 168;
-
-    if (horasDeIntervalo === 0) return;
-
-    const [diaI, mesI, anoI] = dtInicio.split('/');
-    const [horaI, minI] = hrInicio.split(':');
-    let doseAtual = new Date(Number(anoI), Number(mesI) - 1, Number(diaI), Number(horaI), Number(minI));
-
-    const [diaT, mesT, anoT] = dtTermino.split('/');
-    const fimTratamento = new Date(Number(anoT), Number(mesT) - 1, Number(diaT), 23, 59);
-
-    while (doseAtual <= fimTratamento) {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: 'Hora do Remédio! 💊',
-          body: `Está na hora de dar ${nomeMedicamento}.`,
-        },
-        trigger: {
-          type: 'date',
-          date: doseAtual,
-        } as Notifications.NotificationTriggerInput,
-      });
-
-      doseAtual.setHours(doseAtual.getHours() + horasDeIntervalo);
-    }
+  // Função mantida como no-op compatível para não quebrar componentes que a chamam
+  async function agendarNotificacoes(
+    _nomeMedicamento: string,
+    _dtInicio: string,
+    _dtTermino: string,
+    _hrInicio: string,
+    _freqQtd: number,
+    _freqUnidade: string
+  ) {
+    return Promise.resolve();
   }
 
   const abrirEditar = useCallback((medicamento: Medicamento) => {
