@@ -9,7 +9,7 @@ import {
   useWindowDimensions,
   Image,
   ImageProps,
-
+  Platform,
 } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { tipografia } from '@/styles/tipografia';
@@ -83,7 +83,7 @@ export default function ModalSucesso({
     Animated.timing(fadeAnim, {
       toValue: 0,
       duration: 200,
-      useNativeDriver: true,
+      useNativeDriver: Platform.OS !== 'web',
     }).start(() => {
       if (callback) {
         callback();
@@ -104,7 +104,7 @@ export default function ModalSucesso({
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 300,
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== 'web',
       }).start();
 
       timerRef.current = setTimeout(() => {

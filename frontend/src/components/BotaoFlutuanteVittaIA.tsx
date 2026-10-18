@@ -6,6 +6,7 @@ import {
     View,
     StyleSheet,
     Animated,
+    Platform,
 } from "react-native";
 import { tipografia } from "@/styles/tipografia";
 import VittaIA from "./vittaIA";
@@ -26,13 +27,13 @@ export default function BotaoFlutuanteVittaIA() {
             Animated.timing(animOpacity, {
                 toValue: 1,
                 duration: 200,
-                useNativeDriver: true,
+                useNativeDriver: Platform.OS !== 'web',
             }),
             Animated.spring(animScale, {
                 toValue: 1.12,
                 friction: 5,
                 tension: 100,
-                useNativeDriver: true,
+                useNativeDriver: Platform.OS !== 'web',
             }),
         ]).start();
     };
@@ -43,12 +44,12 @@ export default function BotaoFlutuanteVittaIA() {
             Animated.timing(animOpacity, {
                 toValue: 0.6,
                 duration: 300,
-                useNativeDriver: true,
+                useNativeDriver: Platform.OS !== 'web',
             }),
             Animated.spring(animScale, {
                 toValue: 1,
                 friction: 6,
-                useNativeDriver: true,
+                useNativeDriver: Platform.OS !== 'web',
             }),
         ]).start();
     };

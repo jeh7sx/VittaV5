@@ -5,6 +5,7 @@ import {
 	Animated,
 	StyleSheet,
 	useWindowDimensions,
+	Platform,
 } from 'react-native';
 import { colors } from '@/styles/colors';
 import { tipografia } from '@/styles/tipografia';
@@ -49,34 +50,34 @@ export default function LoadingGlobal({
 					Animated.timing(animEscala, {
 						toValue: 1.05,
 						duration: 900,
-						useNativeDriver: true,
+						useNativeDriver: Platform.OS !== 'web',
 					}),
 					Animated.timing(animOpacidade, {
 						toValue: 1,
 						duration: 900,
-						useNativeDriver: true,
+						useNativeDriver: Platform.OS !== 'web',
 					}),
 					Animated.timing(animHalo, {
 						toValue: 0.8,
 						duration: 900,
-						useNativeDriver: true,
+						useNativeDriver: Platform.OS !== 'web',
 					}),
 				]),
 				Animated.parallel([
 					Animated.timing(animEscala, {
 						toValue: 1,
 						duration: 900,
-						useNativeDriver: true,
+						useNativeDriver: Platform.OS !== 'web',
 					}),
 					Animated.timing(animOpacidade, {
 						toValue: 0.85,
 						duration: 900,
-						useNativeDriver: true,
+						useNativeDriver: Platform.OS !== 'web',
 					}),
 					Animated.timing(animHalo, {
 						toValue: 0.3,
 						duration: 900,
-						useNativeDriver: true,
+						useNativeDriver: Platform.OS !== 'web',
 					}),
 				]),
 			])
@@ -88,12 +89,12 @@ export default function LoadingGlobal({
 				Animated.timing(animBarra, {
 					toValue: 1,
 					duration: 1300,
-					useNativeDriver: true,
+					useNativeDriver: Platform.OS !== 'web',
 				}),
 				Animated.timing(animBarra, {
 					toValue: 0,
 					duration: 0,
-					useNativeDriver: true,
+					useNativeDriver: Platform.OS !== 'web',
 				}),
 			])
 		);
