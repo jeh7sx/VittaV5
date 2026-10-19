@@ -9,12 +9,14 @@ import {
 } from '@expo-google-fonts/inter';
 import { useFonts } from 'expo-font';
   // Função para carregar a fonte inter
-  const fontsLoaded = useFonts({
+export function useCarregarFontes() {
+  return useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
   });
+}
 export const tipografia = {
 
   h1: {

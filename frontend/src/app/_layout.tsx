@@ -6,6 +6,7 @@ import { Platform } from "react-native";
 import { FilhoProvider } from "@/context/FilhoContext";
 import { auth, db } from "../services/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { useCarregarFontes } from "@/styles/tipografia";
 
 import LoadingVitta from '@/components/carregamentoVitta';
 
@@ -32,6 +33,7 @@ const TITULOS_ROTAS: Record<string, string> = {
 };
 
 export default function RootLayout() {
+  useCarregarFontes();
   const [carregando, setCarregando] = useState(true);
   const segments = useSegments();
   const grupoAtual = segments[0];
