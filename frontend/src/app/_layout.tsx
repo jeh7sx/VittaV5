@@ -2,12 +2,10 @@
 import { Stack, router, useSegments } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { Platform } from "react-native";
+import { Platform, View, ActivityIndicator } from "react-native";
 import { FilhoProvider } from "@/context/FilhoContext";
 import { auth, db } from "../services/firebase";
 import { doc, getDoc } from "firebase/firestore";
-
-import LoadingVitta from '@/components/carregamentoVitta';
 
 const TITULOS_ROTAS: Record<string, string> = {
   index: "Início",
@@ -37,7 +35,7 @@ export default function RootLayout() {
   const grupoAtual = segments[0];
 
   useEffect(() => {
-    if (Platform.OS === "web") {
+    if (Platform.OS === "web" && typeof document !== "undefined") {
       const ultimoSegmento = segments[segments.length - 1];
 
       let nomePagina = "Início";
@@ -48,14 +46,6 @@ export default function RootLayout() {
       }
 
       document.title = `Vitta - ${nomePagina}`;
-
-      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
-      if (!link) {
-        link = document.createElement("link");
-        link.rel = "icon";
-        document.head.appendChild(link);
-      }
-      link.href = require("@/img/logo.png");
     }
   }, [segments]);
 
@@ -76,7 +66,6 @@ export default function RootLayout() {
 
       const estaEmPaginaPublica = rotasPublicas.includes(grupoAtual);
 
-      // 1. Deslogado: Bloqueia acesso a rotas privadas
       if (!user) {
         if (!estaEmAuth && !estaEmPaginaPublica) {
           router.replace("/login");
@@ -85,7 +74,6 @@ export default function RootLayout() {
         return;
       }
 
-      // 2. Logado: Administrador vs Utilizador
       try {
         const adminRef = doc(db, "admins", user.uid);
         const snap = await getDoc(adminRef);
@@ -96,7 +84,6 @@ export default function RootLayout() {
             router.replace("/dashboard");
           }
         } else {
-          // Se for usuário comum em login/cadastro ou área de admin, direciona para o app
           if (estaEmAuth || grupoAtual === "(admin)") {
             router.replace("/visaoGeral");
           }
@@ -112,7 +99,11 @@ export default function RootLayout() {
   }, [grupoAtual]);
 
   if (carregando) {
-    return <LoadingVitta />;
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#FFFFFF" }}>
+        <ActivityIndicator size="large" color="#208AEF" />
+      </View>
+    );
   }
 
   return (
