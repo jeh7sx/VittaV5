@@ -240,6 +240,7 @@ export default function UsuariosAdmin() {
                     texto={`Filtrar${filtroStatus !== 'todos' ? ' •' : ''}`}
                     onPress={() => setModalFiltroVisivel(!modalFiltroVisivel)}
                     icone={require('@/img/icons/filter-horizontal.svg')}
+                    style={{ width: '100%' }}
                   />
                 </View>
 
@@ -248,6 +249,7 @@ export default function UsuariosAdmin() {
                     texto="Exportar CSV"
                     onPress={exportarUsuariosCSV}
                     icone={require('@/img/icons/upload-01.svg')}
+                    style={{ width: '100%' }}
                   />
                 </View>
 

@@ -223,7 +223,7 @@ export const getStyles = (theme: ThemeColors) =>
       justifyContent: 'center',
     },
     acoesModal: {
-      flexDirection: 'row',
+      flexDirection: 'column',
       gap: 8,
       marginTop: 18,
     },

@@ -374,7 +374,7 @@ export default function EquipeAdmin() {
         </View>
 
         {/* Topo com Ação de Adicionar */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <View style={{  justifyContent: 'space-between', marginBottom: 20, gap: 8 }}>
           <View>
             <Text style={{ fontSize: 18, fontWeight: '800', color: '#1A1A1A' }}>Equipe de Administradores</Text>
             <Text style={{ fontSize: 12, color: '#888' }}>Gerencie os níveis de acesso e novos administradores</Text>

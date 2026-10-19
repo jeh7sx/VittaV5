@@ -142,7 +142,7 @@ export default function Calendario() {
                 </TouchableOpacity>
               </View>
 
-              <View style={{ alignSelf: isMobile ? 'stretch' : 'auto' }}>
+              <View style={{ alignSelf: isMobile ? 'stretch' : 'auto', flexDirection: 'row-reverse' }}>
                 <ButtonTertiary
                   texto="Filtrar"
                   onPress={() => setModalFiltroVisivel(true)}

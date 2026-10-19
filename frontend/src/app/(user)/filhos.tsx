@@ -931,12 +931,12 @@ function ModalFilho({
               </View>
             </View>
 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8, marginTop: 8 }}>
+            <View style={{ flexDirection: 'column', justifyContent: 'space-between', gap: 8, marginTop: 8 }}>
               <ButtonSecondary
                 texto="Cancelar"
                 onPress={cancelar}
                 icone={require('@/img/icons/x.svg')}
-                style={{ width: '48%' }}
+                style={{ width: '100%' }}
               />
               <ButtonPrimary
                 texto={
@@ -948,7 +948,7 @@ function ModalFilho({
                 }
                 onPress={salvar}
                 icone={require('@/img/icons/save.svg')}
-                style={{ width: '48%' }}
+                style={{ width: '100%' }}
               />
             </View>
           </View>

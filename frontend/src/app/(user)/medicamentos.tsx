@@ -529,14 +529,14 @@ export default function Medicamentos() {
               limparFormCadastro();
               setModalCadastro(false);
             }}
-            style={{ width: '48%' }}
+            style={{ width: '100%' }}
             icone={require('@/img/icons/x.svg')}
           />
           <ButtonPrimary
             texto="Adicionar"
             onPress={cadastrarMedicamento}
             icone={require('@/img/icons/add-01.svg')}
-            style={{ width: '48%' }}
+            style={{ width: '100%' }}
           />
         </View>
       </ModalPadrao>
@@ -573,14 +573,14 @@ export default function Medicamentos() {
           <ButtonSecondary
             texto="Cancelar"
             onPress={() => setModalEditar(false)}
-            style={{ width: '48%' }}
+            style={{ width: '100%' }}
             icone={require('@/img/icons/x.svg')}
           />
           <ButtonPrimary
             texto="Salvar alterações"
             onPress={salvarEdicao}
             icone={require('@/img/icons/add-01.svg')}
-            style={{ width: '48%' }}
+            style={{ width: '100%' }}
           />
         </View>
       </ModalPadrao>
