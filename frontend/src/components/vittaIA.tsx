@@ -32,6 +32,7 @@ import { MedicamentoData, ConsultaData, ExameData, ChatSession } from '@/types/v
 export default function VittaIA() {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  const isPequeno = width < 480;
 
   const { theme } = useTheme();
   const { filhoSelecionado } = useFilho();
@@ -143,6 +144,16 @@ export default function VittaIA() {
     await confirmarMedicamento();
     await carregarBiblioteca();
   };
+
+  // Texto adaptável conforme largura do ecrã
+  const placeholderResponsivo =
+    modoAtivo === 'assistente'
+      ? isPequeno
+        ? 'Como posso ajudar?'
+        : 'Pergunte sobre remédios, exames ou cuidados...'
+      : isPequeno
+        ? 'Relate uma dúvida ou problema...'
+        : 'Relate uma dúvida ou problema do sistema...';
 
   return (
     <KeyboardAvoidingView
@@ -263,10 +274,10 @@ export default function VittaIA() {
             >
               {mensagens.length === 0 && !temAcaoPendente && (
                 <View style={{ alignItems: 'center', marginBottom: 20 }}>
-                  <Text style={[tipografia.h2, { color: theme.textPrimary }]}>
+                  <Text style={[tipografia.h2, { color: theme.textPrimary, textAlign: 'center' }]}>
                     Precisando de ajuda? Peça ao <Text style={[tipografia.h2, { color: theme.yellow5 }]}>VittaIA!</Text>
                   </Text>
-                  <Text style={{ fontSize: 14, color: theme.textSecondary, marginTop: 8, textAlign: 'center', maxWidth: 460 }}>
+                  <Text style={{ fontSize: isPequeno ? 13 : 14, color: theme.textSecondary, marginTop: 8, textAlign: 'center', maxWidth: 460 }}>
                     {modoAtivo === 'assistente'
                       ? 'Estou pronta para ajudar na rotina oncológica, horários de remédios e exames.'
                       : 'Estou em modo suporte para tirar dúvidas sobre o app ou conectar você à nossa equipe.'}
@@ -407,7 +418,7 @@ export default function VittaIA() {
                     alignItems: 'center',
                     gap: 6,
                     paddingVertical: 6,
-                    paddingHorizontal: 14,
+                    paddingHorizontal: isPequeno ? 10 : 14,
                     borderRadius: 999,
                     backgroundColor: modoAtivo === 'assistente' ? theme.cardBg : 'transparent',
                   }}
@@ -419,7 +430,7 @@ export default function VittaIA() {
                   />
                   <Text
                     style={{
-                      fontSize: 13,
+                      fontSize: isPequeno ? 12 : 13,
                       fontWeight: modoAtivo === 'assistente' ? '700' : '500',
                       color: modoAtivo === 'assistente' ? theme.textPrimary : theme.textSecondary,
                     }}
@@ -435,7 +446,7 @@ export default function VittaIA() {
                     alignItems: 'center',
                     gap: 6,
                     paddingVertical: 6,
-                    paddingHorizontal: 14,
+                    paddingHorizontal: isPequeno ? 10 : 14,
                     borderRadius: 999,
                     backgroundColor: modoAtivo === 'suporte' ? theme.cardBg : 'transparent',
                   }}
@@ -447,7 +458,7 @@ export default function VittaIA() {
                   />
                   <Text
                     style={{
-                      fontSize: 13,
+                      fontSize: isPequeno ? 12 : 13,
                       fontWeight: modoAtivo === 'suporte' ? '700' : '500',
                       color: modoAtivo === 'suporte' ? theme.textPrimary : theme.textSecondary,
                     }}
@@ -457,7 +468,7 @@ export default function VittaIA() {
                 </TouchableOpacity>
               </View>
 
-              {/* Caixa de Input */}
+              {/* Caixa de Input Responsiva */}
               <View
                 style={{
                   width: '100%',
@@ -468,20 +479,23 @@ export default function VittaIA() {
                   borderRadius: 999,
                   borderWidth: 1,
                   borderColor: theme.border,
-                  paddingHorizontal: 16,
-                  paddingVertical: 8,
+                  paddingHorizontal: isPequeno ? 12 : 16,
+                  paddingVertical: isPequeno ? 6 : 8,
                 }}
               >
                 <TextInput
-                  placeholder={
-                    modoAtivo === 'assistente'
-                      ? 'Pergunte sobre remédios, exames ou cuidados...'
-                      : 'Relate uma dúvida ou problema do sistema...'
-                  }
+                  placeholder={placeholderResponsivo}
                   placeholderTextColor={theme.gray4}
                   value={inputTexto}
                   onChangeText={setInputTexto}
-                  style={{ flex: 1, fontSize: 15, color: theme.textPrimary, outlineStyle: 'none' as any }}
+                  style={{
+                    flex: 1,
+                    fontSize: isPequeno ? 13 : 15,
+                    color: theme.textPrimary,
+                    paddingVertical: Platform.OS === 'ios' ? 8 : 4,
+                    paddingRight: 8,
+                    outlineStyle: 'none' as any,
+                  }}
                   editable={!carregando}
                   onSubmitEditing={enviarMensagem}
                 />
@@ -490,24 +504,25 @@ export default function VittaIA() {
                   onPress={enviarMensagem}
                   disabled={!podeEnviar}
                   style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 19,
+                    width: isPequeno ? 34 : 38,
+                    height: isPequeno ? 34 : 38,
+                    borderRadius: 999,
                     backgroundColor: podeEnviar ? theme.yellow5 : theme.inputBg,
                     justifyContent: 'center',
                     alignItems: 'center',
+                    flexShrink: 0,
                   }}
                   activeOpacity={0.8}
                 >
                   <Ionicons
                     name="arrow-up"
-                    size={20}
-                    color={podeEnviar ? (theme.id === 'dark' ? '#000' : '#FFF') : theme.gray4}
+                    size={isPequeno ? 18 : 20}
+                    color={podeEnviar ? (theme.id === 'dark' ? '#000' : '#FFF') : theme.yellow5}
                   />
                 </TouchableOpacity>
               </View>
 
-              <Text style={{ fontSize: 12, color: theme.textSecondary, marginTop: 10, textAlign: 'center' }}>
+              <Text style={{ fontSize: isPequeno ? 11 : 12, color: theme.textSecondary, marginTop: 10, textAlign: 'center' }}>
                 A Vitta IA não fornece diagnósticos. Em caso de dúvidas médicas urgentes, consulte o oncologista.
               </Text>
             </View>
