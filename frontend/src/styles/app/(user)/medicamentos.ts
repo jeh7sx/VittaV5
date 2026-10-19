@@ -124,6 +124,39 @@ export const getStyles = (theme: ThemeColors) =>
       alignItems: 'center',
       gap: 8,
     },
+
+    // Botão e Menu dos Três Pontinhos (Mais Opções)
+    btnMaisOpcoes: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    menuOpcoesDropdown: {
+      position: 'absolute',
+      top: 35,
+      right: 0,
+      minWidth: 140,
+      backgroundColor: theme.cardBg,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.border,
+      overflow: 'hidden',
+      zIndex: 9999,
+      elevation: 9999,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+    },
+    itemMenuOpcoes: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+    },
+
     botaoVerMaisMenos: {
       height: 50,
       alignItems: 'center',

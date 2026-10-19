@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,8 @@ import {
   useWindowDimensions,
   Platform,
   StatusBar,
+  Animated,
+  PanResponder,
 } from 'react-native';
 import { router, usePathname } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
@@ -51,6 +53,7 @@ const LARGURA_ABERTA = 286;
 const LARGURA_FECHADA = 84;
 const BREAKPOINT_DESKTOP = 768;
 const STORAGE_KEY = '@vitta_user_sidebar_aberta';
+const STORAGE_POSICAO_Y = '@vitta_sidebar_btn_pos_y';
 
 interface UsuarioLogado {
   nome: string;
@@ -63,7 +66,7 @@ export default function Sidebar() {
   const { theme } = useTheme();
 
   const pathname = usePathname();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
 
   const isDesktop = width >= BREAKPOINT_DESKTOP;
   const topoSeguro = Platform.OS === 'android' ? StatusBar.currentHeight || 16 : 16;
@@ -78,6 +81,56 @@ export default function Sidebar() {
     email: 'usuario@gmail.com',
     fotoUri: null,
   });
+
+  // Animação e arrasto do botão flutuante mobile
+  const panY = useRef(new Animated.Value(topoSeguro)).current;
+  const ultimoY = useRef(topoSeguro);
+
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_POSICAO_Y).then((salvo) => {
+      if (salvo !== null) {
+        const valor = parseFloat(salvo);
+        if (!isNaN(valor)) {
+          panY.setValue(valor);
+          ultimoY.current = valor;
+        }
+      }
+    });
+  }, []);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return Math.abs(gestureState.dy) > 6;
+      },
+      onPanResponderGrant: () => {
+        panY.setOffset(ultimoY.current);
+        panY.setValue(0);
+      },
+      onPanResponderMove: Animated.event([null, { dy: panY }], { useNativeDriver: false }),
+      onPanResponderRelease: (_, gestureState) => {
+        panY.flattenOffset();
+        let destino = ultimoY.current + gestureState.dy;
+
+        // Limita o movimento dentro dos limites visíveis do ecrã
+        const minTop = topoSeguro;
+        const maxTop = height - 90;
+
+        if (destino < minTop) destino = minTop;
+        if (destino > maxTop) destino = maxTop;
+
+        ultimoY.current = destino;
+        Animated.spring(panY, {
+          toValue: destino,
+          useNativeDriver: false,
+          bounciness: 4,
+        }).start();
+
+        AsyncStorage.setItem(STORAGE_POSICAO_Y, String(destino));
+      },
+    })
+  ).current;
 
   useEffect(() => {
     const desinscrever = onAuthStateChanged(auth, async (user) => {
@@ -513,7 +566,7 @@ export default function Sidebar() {
                     width: 14,
                     height: 14,
                     tintColor: configAtivo
-                      ? (theme.modo === 'escuro' ? '#000' : theme.yellow9)
+                      ? (theme.modo === 'escuro' ? '#000' : theme.gray4)
                       : theme.gray4,
                   }}
                   resizeMode="contain"
@@ -737,34 +790,43 @@ export default function Sidebar() {
 
   return (
     <>
-      <TouchableOpacity
-        onPress={toggleSidebar}
+      {/* Botão Flutuante Móvel com Opacidade Reduzida e Arraste Vertical */}
+      <Animated.View
+        {...panResponder.panHandlers}
         style={{
           position: 'absolute',
-          top: topoSeguro,
-          left: 16,
+          top: panY,
+          left: 12,
           zIndex: 200,
-          width: 40,
-          height: 40,
-          borderRadius: 12,
-          backgroundColor: theme.cardBg,
-          borderWidth: 1,
-          borderColor: theme.border,
-          justifyContent: 'center',
-          alignItems: 'center',
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 6,
-          elevation: 4,
+          opacity: 0.65, // Opacidade reduzida para ver através
         }}
       >
-        <Image
-          source={require('@/img/icons/sideBarClosed.svg')}
-          style={{ width: 20, height: 20, tintColor: theme.textSecondary }}
-          resizeMode="contain"
-        />
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={toggleSidebar}
+          activeOpacity={0.7}
+          style={{
+            width: 42,
+            height: 42,
+            borderRadius: 14,
+            backgroundColor: theme.modo === 'escuro' ? 'rgba(30, 30, 30, 0.75)' : 'rgba(255, 255, 255, 0.75)',
+            borderWidth: 1,
+            borderColor: theme.yellow5,
+            justifyContent: 'center',
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.12,
+            shadowRadius: 6,
+            elevation: 4,
+          }}
+        >
+          <Image
+            source={require('@/img/icons/sideBarClosed.svg')}
+            style={{ width: 20, height: 20, tintColor: theme.textSecondary }}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </Animated.View>
 
       {aberta && (
         <Pressable

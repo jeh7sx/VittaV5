@@ -328,7 +328,7 @@ export default function Medicamentos() {
                     },
                   ]}
                 >
-                 <ScrollView
+                  <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     style={{ width: '100%' }}
@@ -431,15 +431,29 @@ export default function Medicamentos() {
                       theme={theme}
                       podeEditar={podeEditarFilhoSelecionado}
                       popoverAberto={popoverStatus === item.id}
+                      menuOpcoesAberto={menuOpcoes === item.id}
                       onTogglePopover={() => {
                         if (!podeEditarFilhoSelecionado) return;
                         setPopoverStatus(popoverStatus === item.id ? null : item.id);
                         setMenuOpcoes(null);
                       }}
+                      onToggleMenuOpcoes={() => {
+                        setMenuOpcoes(menuOpcoes === item.id ? null : item.id);
+                        setPopoverStatus(null);
+                      }}
                       onAlterarStatus={(st) => alterarStatus(item.id, st)}
-                      onVerMais={() => setModalVerMais(item)}
-                      onEditar={() => handleAbrirEditarCustom(item)}
-                      onExcluir={() => confirmarExclusao(item.id)}
+                      onVerMais={() => {
+                        setMenuOpcoes(null);
+                        setModalVerMais(item);
+                      }}
+                      onEditar={() => {
+                        setMenuOpcoes(null);
+                        handleAbrirEditarCustom(item);
+                      }}
+                      onExcluir={() => {
+                        setMenuOpcoes(null);
+                        confirmarExclusao(item.id);
+                      }}
                     />
                   ))}
 
@@ -632,7 +646,9 @@ function CardMedicamentoItem({
   theme,
   podeEditar,
   popoverAberto,
+  menuOpcoesAberto,
   onTogglePopover,
+  onToggleMenuOpcoes,
   onAlterarStatus,
   onVerMais,
   onEditar,
@@ -643,14 +659,15 @@ function CardMedicamentoItem({
   theme: any;
   podeEditar: boolean;
   popoverAberto: boolean;
+  menuOpcoesAberto: boolean;
   onTogglePopover: () => void;
+  onToggleMenuOpcoes: () => void;
   onAlterarStatus: (status: StatusMedicamento) => void;
   onVerMais: () => void;
   onEditar: () => void;
   onExcluir: () => void;
 }) {
   const proximoInfo = obterProximoHorario(item);
-  const turno = proximoInfo?.turno || item.turno || calcularTurno(item.horario);
   const displayHorario = proximoInfo ? proximoInfo.dataFormatada : `${item.horario} horas`;
 
   return (
@@ -664,8 +681,8 @@ function CardMedicamentoItem({
           minHeight: isNarrow ? 76 : 96,
           backgroundColor: theme.cardBg,
           borderColor: theme.border,
-          zIndex: popoverAberto ? 1000 : 1,
-          elevation: popoverAberto ? 1000 : 1,
+          zIndex: (popoverAberto || menuOpcoesAberto) ? 1000 : 1,
+          elevation: (popoverAberto || menuOpcoesAberto) ? 1000 : 1,
           width: '100%',
         },
       ]}
@@ -731,23 +748,49 @@ function CardMedicamentoItem({
         )}
       </View>
 
-      {!isNarrow && (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginLeft: 2 }}>
-          <TouchableOpacity accessibilityLabel="Visualizar medicamento" activeOpacity={0.65} onPress={onVerMais} style={{ padding: 6 }}>
-            <Image source={require('@/img/icons/view.svg')} style={{ width: 24, height: 24, tintColor: theme.textPrimary }} />
-          </TouchableOpacity>
-          {podeEditar && (
-            <>
-              <TouchableOpacity accessibilityLabel="Editar medicamento" activeOpacity={0.65} onPress={onEditar} style={{ padding: 6 }}>
-                <Image source={require('@/img/icons/edit-02.svg')} style={{ width: 24, height: 24, tintColor: theme.textPrimary }} />
-              </TouchableOpacity>
-              <TouchableOpacity accessibilityLabel="Excluir medicamento" activeOpacity={0.65} onPress={onExcluir} style={{ padding: 6 }}>
-                <Image source={require('@/img/icons/delete-02.svg')} style={{ width: 24, height: 24, tintColor: '#E11919' }} />
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
-      )}
+      {/* Menu de 3 Pontinhos */}
+      <View style={{ position: 'relative', flexShrink: 0 }}>
+        <TouchableOpacity
+          accessibilityLabel="Mais opções"
+          activeOpacity={0.7}
+          onPress={onToggleMenuOpcoes}
+          style={styles.btnMaisOpcoes}
+        >
+          <Text style={{ fontSize: 20, lineHeight: 20, fontWeight: 'bold', color: theme.textSecondary }}>⋮</Text>
+        </TouchableOpacity>
+
+        {menuOpcoesAberto && (
+          <View style={[styles.menuOpcoesDropdown, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+            <TouchableOpacity
+              onPress={onVerMais}
+              style={[styles.itemMenuOpcoes, { borderBottomWidth: 1, borderBottomColor: theme.border }]}
+            >
+              <Image source={require('@/img/icons/view.svg')} style={{ width: 18, height: 18, tintColor: theme.textPrimary }} />
+              <Text style={{ color: theme.textPrimary, fontSize: 14, fontWeight: '500' }}>Ver mais</Text>
+            </TouchableOpacity>
+
+            {podeEditar && (
+              <>
+                <TouchableOpacity
+                  onPress={onEditar}
+                  style={[styles.itemMenuOpcoes, { borderBottomWidth: 1, borderBottomColor: theme.border }]}
+                >
+                  <Image source={require('@/img/icons/edit-02.svg')} style={{ width: 18, height: 18, tintColor: theme.textPrimary }} />
+                  <Text style={{ color: theme.textPrimary, fontSize: 14, fontWeight: '500' }}>Editar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={onExcluir}
+                  style={styles.itemMenuOpcoes}
+                >
+                  <Image source={require('@/img/icons/delete-02.svg')} style={{ width: 18, height: 18, tintColor: '#E11919' }} />
+                  <Text style={{ color: '#E11919', fontSize: 14, fontWeight: '500' }}>Excluir</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -1053,100 +1096,100 @@ function ModalVerMaisMed({
             <View style={{ height: 1, backgroundColor: theme.border, marginBottom: 16 }} />
 
             <View style={{ gap: 16, marginBottom: 16 }}>
-  {Boolean(medAtual?.tipo) && (
-    <InfoRow
-      icon={require('@/img/icons/medicamento.svg')}
-      label="Tipo"
-      value={medAtual.tipo}
-      theme={theme}
-    />
-  )}
+              {Boolean(medAtual?.tipo) && (
+                <InfoRow
+                  icon={require('@/img/icons/medicamento.svg')}
+                  label="Tipo"
+                  value={medAtual.tipo}
+                  theme={theme}
+                />
+              )}
 
-  {Boolean(medAtual?.dosagem) && (
-    <InfoRow
-      icon={require('@/img/icons/balance-scale.svg')}
-      label="Dosagem"
-      value={medAtual.dosagem}
-      theme={theme}
-    />
-  )}
+              {Boolean(medAtual?.dosagem) && (
+                <InfoRow
+                  icon={require('@/img/icons/balance-scale.svg')}
+                  label="Dosagem"
+                  value={medAtual.dosagem}
+                  theme={theme}
+                />
+              )}
 
-  {Boolean(medAtual?.frequencia) && (
-    <InfoRow
-      icon={require('@/img/icons/repeat-one-01.svg')}
-      label="Frequência"
-      value={medAtual.frequencia}
-      theme={theme}
-    />
-  )}
+              {Boolean(medAtual?.frequencia) && (
+                <InfoRow
+                  icon={require('@/img/icons/repeat-one-01.svg')}
+                  label="Frequência"
+                  value={medAtual.frequencia}
+                  theme={theme}
+                />
+              )}
 
-  {Boolean(medAtual?.dataInicio) && (
-    <InfoRow
-      icon={require('@/img/icons/calendar-02.svg')}
-      label="Período"
-      value={medAtual.dataTermino ? `${medAtual.dataInicio} até ${medAtual.dataTermino}` : medAtual.dataInicio}
-      theme={theme}
-    />
-  )}
+              {Boolean(medAtual?.dataInicio) && (
+                <InfoRow
+                  icon={require('@/img/icons/calendar-02.svg')}
+                  label="Período"
+                  value={medAtual.dataTermino ? `${medAtual.dataInicio} até ${medAtual.dataTermino}` : medAtual.dataInicio}
+                  theme={theme}
+                />
+              )}
 
-  {/* Doses programadas */}
-  {todasAsDoses.length > 0 && (
-    <View style={{ marginTop: 8 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-        <Text style={[tipografia.caption, { color: theme.textSecondary }]}>
-          Horários Programados ({todasAsDoses.length} doses)
-        </Text>
-        <View style={{ flexDirection: 'row', gap: 6 }}>
-          <TouchableOpacity
-            onPress={() => scrollDosesRef.current?.scrollTo({ x: 0, animated: true })}
-            style={{ padding: 6, backgroundColor: theme.inputBg, borderRadius: 999 }}
-          >
-            <Image source={require('@/img/icons/setaEsquerda.svg')} style={{ tintColor: theme.textPrimary }} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => scrollDosesRef.current?.scrollToEnd({ animated: true })}
-            style={{ padding: 6, backgroundColor: theme.inputBg, borderRadius: 999 }}
-          >
-            <Image source={require('@/img/icons/setaDireita.svg')} style={{ tintColor: theme.textPrimary }} />
-          </TouchableOpacity>
-        </View>
-      </View>
+              {/* Doses programadas */}
+              {todasAsDoses.length > 0 && (
+                <View style={{ marginTop: 8 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <Text style={[tipografia.caption, { color: theme.textSecondary }]}>
+                      Horários Programados ({todasAsDoses.length} doses)
+                    </Text>
+                    <View style={{ flexDirection: 'row', gap: 6 }}>
+                      <TouchableOpacity
+                        onPress={() => scrollDosesRef.current?.scrollTo({ x: 0, animated: true })}
+                        style={{ padding: 6, backgroundColor: theme.inputBg, borderRadius: 999 }}
+                      >
+                        <Image source={require('@/img/icons/setaEsquerda.svg')} style={{ tintColor: theme.textPrimary }} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => scrollDosesRef.current?.scrollToEnd({ animated: true })}
+                        style={{ padding: 6, backgroundColor: theme.inputBg, borderRadius: 999 }}
+                      >
+                        <Image source={require('@/img/icons/setaDireita.svg')} style={{ tintColor: theme.textPrimary }} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
 
-      <ScrollView ref={scrollDosesRef} horizontal showsHorizontalScrollIndicator contentContainerStyle={{ gap: 8, paddingVertical: 4 }}>
-        {todasAsDoses.map((dose: Date, idx: number) => {
-          const dia = String(dose.getDate()).padStart(2, '0');
-          const mes = String(dose.getMonth() + 1).padStart(2, '0');
-          const hora = String(dose.getHours()).padStart(2, '0');
-          const min = String(dose.getMinutes()).padStart(2, '0');
-          const jaTomou = (medAtual.dosesTomadas || []).includes(dose.getTime());
-          const estilo = obterEstiloDose(dose, medAtual.dosesTomadas || [], medAtual.status);
+                  <ScrollView ref={scrollDosesRef} horizontal showsHorizontalScrollIndicator contentContainerStyle={{ gap: 8, paddingVertical: 4 }}>
+                    {todasAsDoses.map((dose: Date, idx: number) => {
+                      const dia = String(dose.getDate()).padStart(2, '0');
+                      const mes = String(dose.getMonth() + 1).padStart(2, '0');
+                      const hora = String(dose.getHours()).padStart(2, '0');
+                      const min = String(dose.getMinutes()).padStart(2, '0');
+                      const jaTomou = (medAtual.dosesTomadas || []).includes(dose.getTime());
+                      const estilo = obterEstiloDose(dose, medAtual.dosesTomadas || [], medAtual.status);
 
-          return (
-            <TouchableOpacity
-              key={idx}
-              activeOpacity={0.7}
-              onPress={() => onSelecionarDose(dose, medAtual, jaTomou)}
-              style={[styles.doseCardItem, { backgroundColor: estilo.bg, borderColor: estilo.borda }]}
-            >
-              <Text style={{ fontSize: 11, color: estilo.texto, fontWeight: '600' }}>{dia}/{mes}</Text>
-              <Text style={{ fontSize: 13, fontWeight: '800', color: estilo.texto, marginTop: 2 }}>{hora}:{min}</Text>
-              <Text style={{ fontSize: 9, fontWeight: '700', color: estilo.texto, marginTop: 3 }}>{estilo.label}</Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-    </View>
-  )}
+                      return (
+                        <TouchableOpacity
+                          key={idx}
+                          activeOpacity={0.7}
+                          onPress={() => onSelecionarDose(dose, medAtual, jaTomou)}
+                          style={[styles.doseCardItem, { backgroundColor: estilo.bg, borderColor: estilo.borda }]}
+                        >
+                          <Text style={{ fontSize: 11, color: estilo.texto, fontWeight: '600' }}>{dia}/{mes}</Text>
+                          <Text style={{ fontSize: 13, fontWeight: '800', color: estilo.texto, marginTop: 2 }}>{hora}:{min}</Text>
+                          <Text style={{ fontSize: 9, fontWeight: '700', color: estilo.texto, marginTop: 3 }}>{estilo.label}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              )}
 
-  {Boolean(medAtual?.hospital) && (
-    <InfoRow
-      icon="🏥"
-      label="Hospital / Farmácia"
-      value={medAtual.hospital}
-      theme={theme}
-    />
-  )}
-</View>
+              {Boolean(medAtual?.hospital) && (
+                <InfoRow
+                  icon="🏥"
+                  label="Hospital / Farmácia"
+                  value={medAtual.hospital}
+                  theme={theme}
+                />
+              )}
+            </View>
 
             {medAtual.fotos?.length > 0 && (
               <View style={{ marginBottom: 16 }}>
