@@ -2,8 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import {
   View,
   StyleSheet,
+  Dimensions,
   Platform,
-  ActivityIndicator,
 } from "react-native";
 import { Stack, router } from "expo-router";
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth, db } from "../../services/firebase";
 import Sidebar from "../../components/Sidebar";
 import GerenciadorLembretes from "../../components/lembretes/gerenciadorLembretes";
+import LoadingVitta from '@/components/carregamentoVitta';
 import { ThemeProvider } from '@/context/ThemeContext';
 
 export const STORAGE_DEVICE_ID_KEY = '@vitta_device_session_id';
@@ -94,10 +95,11 @@ export default function UserLayout() {
           { merge: true }
         );
 
-        // 3. Monitoriza a própria sessão
+        // 3. Monitoriza a própria sessão: se ela for eliminada remotamente pelo utilizador, encerra a sessão na hora
         unsubSessaoDoc = onSnapshot(sessaoRef, async (snap) => {
           if (deslogandoRef.current) return;
 
+          // Se o documento desta sessão foi apagado no Firestore, significa que foi desconectado
           if (!snap.exists()) {
             deslogandoRef.current = true;
             unsubSessaoDoc?.();
@@ -129,11 +131,7 @@ export default function UserLayout() {
   }, []);
 
   if (!autorizado) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#208AEF" />
-      </View>
-    );
+    return <LoadingVitta />;
   }
 
   return (
@@ -164,11 +162,5 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     minWidth: 0,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
   },
 });
