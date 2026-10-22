@@ -21,12 +21,19 @@ interface PublicNavbarProps {
 export function PublicNavbar({ sidePadding }: PublicNavbarProps) {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  const isTablet = width >= 768 && width < 1080;
   const pathname = usePathname();
 
   const [menuAberto, setMenuAberto] = useState(false);
 
   const paddingHorizontal =
-    sidePadding !== undefined ? sidePadding : isMobile ? 20 : width < 1200 ? 48 : 280;
+    sidePadding !== undefined
+      ? sidePadding
+      : isMobile
+        ? 16
+        : isTablet
+          ? 32
+          : Math.max(32, Math.min((width - 1200) / 2, 120));
 
   const links = [
     { label: 'Início', rota: '/' },
@@ -44,7 +51,7 @@ export function PublicNavbar({ sidePadding }: PublicNavbarProps) {
 
   return (
     <>
-      {/* ─── BOTÃO HAMBÚRGUER FLUTUANTE FIXO NO MOBILE ─── */}
+      {/* ─── BOTÃO HAMBÚRGUER FIXO NO MOBILE ─── */}
       {isMobile && (
         <TouchableOpacity
           onPress={() => setMenuAberto(true)}
@@ -83,7 +90,7 @@ export function PublicNavbar({ sidePadding }: PublicNavbarProps) {
         style={{
           width: '100%',
           paddingHorizontal,
-          paddingVertical: 20,
+          paddingVertical: isMobile ? 16 : 20,
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -92,8 +99,7 @@ export function PublicNavbar({ sidePadding }: PublicNavbarProps) {
           borderBottomColor: '#F0F0F0',
         }}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
-          {/* Logótipo */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: isTablet ? 14 : 20 }}>
           <TouchableOpacity onPress={() => router.push('/')} activeOpacity={0.8}>
             <Image
               source={require('@/img/logoVitta.svg')}
@@ -102,9 +108,8 @@ export function PublicNavbar({ sidePadding }: PublicNavbarProps) {
             />
           </TouchableOpacity>
 
-          {/* Links Desktop */}
           {!isMobile && (
-            <View style={{ flexDirection: 'row', gap: 18, alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', gap: isTablet ? 12 : 18, alignItems: 'center' }}>
               {links.map((item) => {
                 const ativo =
                   pathname === item.rota ||
@@ -118,7 +123,7 @@ export function PublicNavbar({ sidePadding }: PublicNavbarProps) {
                       style={[
                         tipografia.body,
                         {
-                          fontSize: 14.5,
+                          fontSize: isTablet ? 13.5 : 14.5,
                           fontWeight: ativo ? '700' : '400',
                           color: ativo ? '#F7B500' : '#1A1A1E',
                         },
@@ -133,9 +138,8 @@ export function PublicNavbar({ sidePadding }: PublicNavbarProps) {
           )}
         </View>
 
-        {/* Botões Entrar / Cadastrar Desktop */}
         {!isMobile && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <ButtonSecondary
               texto="Entrar"
               onPress={() => router.push('/login')}
@@ -168,7 +172,7 @@ export function PublicNavbar({ sidePadding }: PublicNavbarProps) {
         >
           <View
             style={{
-              width: '78%',
+              width: '80%',
               maxWidth: 320,
               height: '100%',
               backgroundColor: '#FFFFFF',
@@ -200,7 +204,7 @@ export function PublicNavbar({ sidePadding }: PublicNavbarProps) {
               </TouchableOpacity>
             </View>
 
-            <View style={{ gap: 14 }}>
+            <View style={{ gap: 10 }}>
               {links.map((item) => {
                 const ativo =
                   pathname === item.rota ||
@@ -210,7 +214,7 @@ export function PublicNavbar({ sidePadding }: PublicNavbarProps) {
                     key={item.rota}
                     onPress={() => navegarPara(item.rota)}
                     style={{
-                      paddingVertical: 10,
+                      paddingVertical: 12,
                       borderBottomWidth: 1,
                       borderBottomColor: '#F0F0F0',
                     }}

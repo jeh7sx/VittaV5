@@ -93,6 +93,7 @@ export default function ButtonPrimary({
         style={[
           {
             width: '100%',
+            height: 48, // Mesma altura fixa do ButtonSecondary
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',

@@ -29,7 +29,6 @@ import ButtonBlack from '@/components/Buttons/ButtonBlack';
 import ButtonWhite from '@/components/Buttons/ButtonWhite';
 import { VittaIADemoModal } from '../components/VittaIADemoModal';
 
-// Array com as imagens do carrossel
 const IMAGENS_CARROSSEL = [
   { id: 1, imagem: require('@/img/indexImg/visaogeral.png'), titulo: 'Dashboard & Visão Geral' },
   { id: 2, imagem: require('@/img/indexImg/calendario.png'), titulo: 'Gestão de Medicamentos' },
@@ -50,13 +49,11 @@ export default function Index() {
 
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
-  const isTablet = width < 1025;
-  const sidePadding = isMobile ? 20 : width < 1200 ? 48 : 280;
+  const isTablet = width >= 768 && width < 1080;
+  const sidePadding = isMobile ? 16 : isTablet ? 32 : Math.max(32, Math.min((width - 1200) / 2, 120));
 
-  // Estado do Menu Hambúrguer Móvel
   const [menuAberto, setMenuAberto] = useState(false);
 
-  // Estados do Carrossel com passo unitário contínuo
   const [passoAtual, setPassoAtual] = useState(0);
   const animPasso = useRef(new Animated.Value(0)).current;
   const animandoRef = useRef(false);
@@ -141,7 +138,7 @@ export default function Index() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-      {/* ─── BOTÃO HAMBÚRGUER FIXO NO MOBILE ─────────────────────── */}
+      {/* ─── BOTÃO HAMBÚRGUER FIXO NO MOBILE ─── */}
       {isMobile && (
         <TouchableOpacity
           onPress={() => setMenuAberto(true)}
@@ -181,17 +178,17 @@ export default function Index() {
         showsVerticalScrollIndicator={false}
       >
         <View style={{ width: '100%', paddingHorizontal: sidePadding }}>
-          {/* ─── 1. NAVBAR (DESKTOP E CABEÇALHO DO LOGO) ─────────────── */}
+          {/* ─── 1. NAVBAR ─── */}
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
-              paddingVertical: 24,
-              marginBottom: isMobile ? 12 : 36,
+              paddingVertical: isMobile ? 18 : 24,
+              marginBottom: isMobile ? 16 : 36,
             }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: isTablet ? 12 : 20 }}>
               <TouchableOpacity onPress={() => navegarPara('/')} activeOpacity={0.8}>
                 <Image
                   source={require('@/img/logoVitta.svg')}
@@ -201,10 +198,10 @@ export default function Index() {
               </TouchableOpacity>
 
               {!isMobile && (
-                <View style={{ flexDirection: 'row', gap: 18, alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', gap: isTablet ? 12 : 18, alignItems: 'center' }}>
                   {linksNavegacao.map((link) => (
                     <TouchableOpacity key={link.rota} onPress={() => navegarPara(link.rota)}>
-                      <Text style={[tipografia.body, { fontSize: 14.5 }]}>{link.label}</Text>
+                      <Text style={[tipografia.body, { fontSize: isTablet ? 13.5 : 14.5 }]}>{link.label}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -212,7 +209,7 @@ export default function Index() {
             </View>
 
             {!isMobile && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 <ButtonSecondary
                   texto="Entrar"
                   onPress={() => navegarPara('/login')}
@@ -227,32 +224,25 @@ export default function Index() {
             )}
           </View>
 
-          {/* ─── 2. HERO SECTION ──────────────────────────────────────── */}
+          {/* ─── 2. HERO SECTION ─── */}
           <View
             style={{
-              flexDirection: isMobile ? 'column' : 'row',
+              flexDirection: isMobile || isTablet ? 'column' : 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginBottom: isMobile ? 60 : 100,
+              gap: isMobile ? 32 : 48,
+              marginBottom: isMobile ? 50 : 90,
             }}
           >
-            <View style={{ gap: 40 }}>
-              <View
-                style={{
-                  maxWidth: isTablet ? '100%' : 687,
-                  alignContent: 'center',
-                  gap: 16,
-                }}
-              >
+            <View style={{ flex: 1, gap: 28, width: '100%', alignItems: isMobile || isTablet ? 'center' : 'flex-start' }}>
+              <View style={{ gap: 14, width: '100%', maxWidth: 640 }}>
                 <Text
                   style={[
                     tipografia.h1,
                     {
-                      fontSize: isMobile ? 30 : isTablet ? 40 : 62,
-                      lineHeight: isMobile ? 32 : isTablet ? 56 : 64,
-                      width: isMobile ? 'auto' : isTablet ? 400 : 800,
-                      alignSelf: 'flex-start',
-                      textAlign: isMobile ? 'center' : 'left',
+                      fontSize: isMobile ? 30 : isTablet ? 42 : 54,
+                      lineHeight: isMobile ? 36 : isTablet ? 48 : 60,
+                      textAlign: isMobile || isTablet ? 'center' : 'left',
                     },
                   ]}
                 >
@@ -260,23 +250,29 @@ export default function Index() {
                   <Text style={tipografia.highlight}>um só lugar.</Text>
                 </Text>
 
-                <View style={{ maxWidth: 580 }}>
-                  <Text
-                    style={[
-                      tipografia.bodySecondary,
-                      {
-                        textAlign: isMobile ? 'center' : 'left',
-                        width: isMobile ? 'auto' : isTablet ? 350 : 600,
-                      },
-                    ]}
-                  >
-                    Registre consultas, exames, medicamentos e informações importantes para
-                    acompanhar a jornada de tratamento com mais segurança e praticidade.
-                  </Text>
-                </View>
+                <Text
+                  style={[
+                    tipografia.bodySecondary,
+                    {
+                      textAlign: isMobile || isTablet ? 'center' : 'left',
+                      fontSize: isMobile ? 14 : 16,
+                      lineHeight: isMobile ? 22 : 24,
+                    },
+                  ]}
+                >
+                  Registre consultas, exames, medicamentos e informações importantes para
+                  acompanhar a jornada de tratamento com mais segurança e praticidade.
+                </Text>
               </View>
 
-              <View style={{ flexDirection: 'row', gap: 8, justifyContent: isMobile ? 'center' : 'flex-start' }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  gap: 10,
+                  flexWrap: 'wrap',
+                  justifyContent: isMobile || isTablet ? 'center' : 'flex-start',
+                }}
+              >
                 <ButtonPrimary
                   texto="Cadastrar"
                   onPress={() => navegarPara('/cadastro')}
@@ -290,26 +286,38 @@ export default function Index() {
               </View>
             </View>
 
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <View
+              style={{
+                flex: isMobile || isTablet ? undefined : 1,
+                width: '100%',
+                maxWidth: 480,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               <Image
                 source={require('../img/heroIllustration.svg')}
-                style={{ width: isMobile ? 300 : 460, height: isMobile ? 260 : 380 }}
+                style={{
+                  width: '100%',
+                  maxWidth: isMobile ? 300 : 440,
+                  height: isMobile ? 240 : 340,
+                }}
                 resizeMode="contain"
               />
             </View>
           </View>
 
           {/* ─── 3. APRESENTAÇÃO DA PLATAFORMA (CARROSSEL) ─── */}
-          <View style={{ marginBottom: isMobile ? 70 : 120, width: '100%', overflow: 'hidden' }}>
+          <View style={{ marginBottom: isMobile ? 60 : 100, width: '100%', overflow: 'hidden' }}>
             <Text
               style={[
                 tipografia.h2,
                 {
-                  fontSize: isMobile ? 28 : 40,
-                  marginBottom: 36,
+                  fontSize: isMobile ? 26 : 38,
+                  marginBottom: 28,
                   letterSpacing: -0.5,
                   textAlign: isMobile ? 'center' : 'left',
-                  lineHeight: isMobile ? 32 : 40,
+                  lineHeight: isMobile ? 32 : 44,
                 },
               ]}
             >
@@ -321,7 +329,7 @@ export default function Index() {
               style={{
                 position: 'relative',
                 width: '100%',
-                height: isMobile ? 320 : 620,
+                height: isMobile ? 280 : isTablet ? 420 : 560,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
@@ -341,8 +349,8 @@ export default function Index() {
                   const indexFoto = ((passoRelativo % totalSlides) + totalSlides) % totalSlides;
                   const item = IMAGENS_CARROSSEL[indexFoto];
 
-                  const cardLargura = isMobile ? width * 0.88 : Math.min(width * 0.65, 860);
-                  const deslocamentoLateral = isMobile ? 220 : 480;
+                  const cardLargura = isMobile ? width * 0.86 : Math.min(width * 0.65, 820);
+                  const deslocamentoLateral = isMobile ? width * 0.6 : Math.min(width * 0.35, 420);
 
                   const translateX = animPasso.interpolate({
                     inputRange: [passoRelativo - 1, passoRelativo, passoRelativo + 1],
@@ -376,17 +384,17 @@ export default function Index() {
                       style={{
                         position: 'absolute',
                         width: cardLargura,
-                        height: isMobile ? 260 : 540,
-                        borderRadius: 24,
+                        height: isMobile ? 230 : isTablet ? 360 : 480,
+                        borderRadius: 20,
                         overflow: 'hidden',
                         backgroundColor: '#FFFFFF',
                         borderWidth: 1,
                         borderColor: '#EFEFEF',
                         shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 12 },
+                        shadowOffset: { width: 0, height: 10 },
                         shadowOpacity: ehAtivo ? 0.14 : 0.05,
-                        shadowRadius: ehAtivo ? 30 : 12,
-                        elevation: ehAtivo ? 10 : 2,
+                        shadowRadius: ehAtivo ? 24 : 10,
+                        elevation: ehAtivo ? 8 : 2,
                         zIndex: 10 - Math.abs(offset),
                         transform: [{ translateX }, { scale }],
                         opacity,
@@ -423,54 +431,54 @@ export default function Index() {
                   onPress={() => mudarPasso(-1)}
                   style={{
                     position: 'absolute',
-                    left: isMobile ? 6 : 28,
+                    left: 6,
                     top: '50%',
-                    marginTop: -24,
-                    width: 48,
-                    height: 48,
-                    borderRadius: 24,
+                    marginTop: -22,
+                    width: 44,
+                    height: 44,
+                    borderRadius: 22,
                     backgroundColor: '#FFFFFF',
                     borderWidth: 1,
                     borderColor: '#E2E2EA',
                     justifyContent: 'center',
                     alignItems: 'center',
                     shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.15,
-                    shadowRadius: 10,
-                    elevation: 12,
+                    shadowOffset: { width: 0, height: 3 },
+                    shadowOpacity: 0.14,
+                    shadowRadius: 8,
+                    elevation: 10,
                     zIndex: 25,
                   }}
                   accessibilityLabel="Slide anterior"
                 >
-                  <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1A1E' }}>‹</Text>
+                  <Text style={{ fontSize: 20, fontWeight: '700', color: '#1A1A1E' }}>‹</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={() => mudarPasso(1)}
                   style={{
                     position: 'absolute',
-                    right: isMobile ? 6 : 28,
+                    right: 6,
                     top: '50%',
-                    marginTop: -24,
-                    width: 48,
-                    height: 48,
-                    borderRadius: 24,
+                    marginTop: -22,
+                    width: 44,
+                    height: 44,
+                    borderRadius: 22,
                     backgroundColor: '#FFFFFF',
                     borderWidth: 1,
                     borderColor: '#E2E2EA',
                     justifyContent: 'center',
                     alignItems: 'center',
                     shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.15,
-                    shadowRadius: 10,
-                    elevation: 12,
+                    shadowOffset: { width: 0, height: 3 },
+                    shadowOpacity: 0.14,
+                    shadowRadius: 8,
+                    elevation: 10,
                     zIndex: 25,
                   }}
                   accessibilityLabel="Próximo slide"
                 >
-                  <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1A1E' }}>›</Text>
+                  <Text style={{ fontSize: 20, fontWeight: '700', color: '#1A1A1E' }}>›</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -481,7 +489,7 @@ export default function Index() {
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: 8,
-                marginTop: 20,
+                marginTop: 18,
               }}
             >
               {IMAGENS_CARROSSEL.map((_, index) => {
@@ -491,9 +499,9 @@ export default function Index() {
                     key={index}
                     onPress={() => irParaSlide(index)}
                     style={{
-                      width: ativo ? 28 : 9,
-                      height: 9,
-                      borderRadius: 5,
+                      width: ativo ? 26 : 8,
+                      height: 8,
+                      borderRadius: 4,
                       backgroundColor: ativo ? colors.yellow6 : '#E2E2EA',
                     }}
                   />
@@ -503,12 +511,12 @@ export default function Index() {
           </View>
         </View>
 
-        {/* ─── 4. SEÇÃO BEGE ────────────────────────────────────────── */}
+        {/* ─── 4. SEÇÃO BEGE ─── */}
         <View
           style={{
             width: '100%',
             backgroundColor: '#FFF8ED',
-            paddingVertical: isMobile ? 50 : 32,
+            paddingVertical: isMobile ? 44 : 56,
             alignItems: 'center',
           }}
         >
@@ -517,11 +525,11 @@ export default function Index() {
               style={[
                 tipografia.h2,
                 {
-                  fontSize: isMobile ? 28 : 42,
-                  lineHeight: isMobile ? 32 : 48,
-                  marginBottom: 40,
+                  fontSize: isMobile ? 26 : isTablet ? 34 : 40,
+                  lineHeight: isMobile ? 32 : isTablet ? 40 : 46,
+                  marginBottom: 36,
                   color: colors.yellow9,
-                  maxWidth: 800,
+                  maxWidth: 780,
                   textAlign: isMobile ? 'center' : 'left',
                 },
               ]}
@@ -531,102 +539,175 @@ export default function Index() {
 
             <View
               style={{
-                flexDirection: isTablet ? 'column' : 'row',
-                gap: 24,
+                flexDirection: isMobile || isTablet ? 'column' : 'row',
+                gap: 20,
                 alignItems: 'stretch',
               }}
             >
+              {/* Card Esquerdo Amarelo */}
               <View
                 style={{
-                  flex: 1,
+                  flex: isMobile || isTablet ? undefined : 1,
+                  width: '100%',
                   backgroundColor: colors.yellow2,
-                  borderRadius: 28,
-                  paddingHorizontal: 40,
-                  paddingVertical: 48,
+                  borderRadius: 24,
+                  paddingHorizontal: isMobile ? 22 : 36,
+                  paddingVertical: isMobile ? 32 : 44,
                   justifyContent: 'space-between',
-                  minHeight: 578,
-                  maxWidth: 450,
-                  gap: 8,
+                  gap: 16,
                 }}
               >
                 <View>
-                  <Text style={[tipografia.h2, { maxWidth: 350, lineHeight: 32, textAlign: isMobile ? 'center' : 'left', fontSize: isMobile ? 24 : 32 }]}>
+                  <Text
+                    style={[
+                      tipografia.h2,
+                      {
+                        lineHeight: isMobile ? 28 : 34,
+                        textAlign: isMobile ? 'center' : 'left',
+                        fontSize: isMobile ? 22 : 28,
+                      },
+                    ]}
+                  >
                     Toda a rotina médica em{' '}
                     <Text style={[tipografia.highlight, { color: colors.yellow7 }]}>apenas um lugar</Text>
                   </Text>
-                  <Text style={[tipografia.body, { marginTop: 10, color: colors.yellow9, textAlign: isMobile ? 'center' : 'left' }]}>
+                  <Text
+                    style={[
+                      tipografia.body,
+                      {
+                        marginTop: 10,
+                        color: colors.yellow9,
+                        textAlign: isMobile ? 'center' : 'left',
+                        fontSize: isMobile ? 14 : 15,
+                      },
+                    ]}
+                  >
                     Tenha sob controle toda a rotina médica do seu filho como exames, medicamentos e consultas!
                   </Text>
                 </View>
 
                 <Image
                   source={require('../img/medicosCard.svg')}
-                  style={{ width: '100%', height: 260, alignSelf: 'center', marginVertical: 10 }}
+                  style={{ width: '100%', height: isMobile ? 200 : 250, alignSelf: 'center', marginVertical: 8 }}
                   resizeMode="contain"
                 />
 
                 <ButtonBlack
                   texto="Saiba mais"
-                  onPress={() => navegarPara('/login')}
+                  onPress={() => navegarPara('/recursos')}
                   icone={require('../img/icons/setaDireita.svg')}
                 />
               </View>
 
-              <View style={{ flex: 1.5, gap: 24 }}>
+              {/* Coluna Direita (Escuro I.A + Logótipo) */}
+              <View style={{ flex: isMobile || isTablet ? undefined : 1.3, width: '100%', gap: 20 }}>
+                {/* ── CARD I.A COM OPÇÃO 2 (ESTILO BANNER COM MARCA D'ÁGUA) ── */}
                 <View
                   style={{
-                    flex: 1,
                     backgroundColor: '#1E1E1E',
-                    borderRadius: 28,
-                    paddingVertical: 48,
-                    paddingHorizontal: 40,
+                    borderRadius: 24,
+                    paddingVertical: isMobile ? 32 : 48,
+                    paddingHorizontal: isMobile ? 24 : 40,
                     flexDirection: isMobile ? 'column' : 'row',
                     justifyContent: 'space-between',
-                    alignItems: 'center',
+                    alignItems: isMobile ? 'flex-start' : 'center',
                     overflow: 'hidden',
+                    position: 'relative',
                     minHeight: 289,
+                    borderWidth: 1,
+                    borderColor: '#2A2A2E',
                   }}
                 >
-                  <View style={{ flexDirection: 'column', gap: 32 }}>
-                    <View style={{ gap: 8 }}>
-                      <Text style={[tipografia.h3, { color: colors.white, textAlign: isMobile ? 'center' : 'left' }]}>
+                  {/* Estrela decorativa no fundo para ecrãs móveis */}
+                  {isMobile && (
+                    <Image
+                      source={require('../img/estrelasIa.svg')}
+                      style={{
+                        position: 'absolute',
+                        right: -12,
+                        top: -12,
+                        width: 125,
+                        height: 125,
+                        opacity: 0.16,
+                      }}
+                      resizeMode="contain"
+                    />
+                  )}
+
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'column',
+                      gap: isMobile ? 20 : 32,
+                      alignItems: 'flex-start',
+                      width: '100%',
+                      zIndex: 2,
+                    }}
+                  >
+                    <View style={{ gap: 8, maxWidth: isMobile ? 280 : 340 }}>
+                      <Text
+                        style={[
+                          tipografia.h3,
+                          {
+                            color: colors.white,
+                            fontSize: isMobile ? 22 : 26,
+                            fontWeight: '700',
+                            textAlign: 'left',
+                          },
+                        ]}
+                      >
                         Teste nossa I.A
                       </Text>
-                      <Text style={[tipografia.bodySecondary, { maxWidth: 280, textAlign: isMobile ? 'center' : 'left' }]}>
+
+                      <Text
+                        style={[
+                          tipografia.bodySecondary,
+                          {
+                            color: '#B3B3B3',
+                            fontSize: isMobile ? 14 : 15,
+                            lineHeight: 20,
+                            textAlign: 'left',
+                          },
+                        ]}
+                      >
                         Experimente nossa inteligência artificial para a organização da sua rotina!
                       </Text>
-                      <View style={{ width: isMobile ? '100%' : 'auto' }}>
-                        <ButtonWhite
-                          texto="Quero experimentar"
-                          onPress={() => setModalDemoAberto(true)}
-                        />
-                      </View>
+                    </View>
+
+                    <View style={{ width: isMobile ? '100%' : 'auto', maxWidth: isMobile ? 240 : undefined }}>
+                      <ButtonWhite
+                        texto="Quero experimentar"
+                        onPress={() => setModalDemoAberto(true)}
+                      />
                     </View>
                   </View>
 
-                  <Image
-                    source={require('../img/estrelasIa.svg')}
-                    style={{ width: 130, height: 130, marginTop: isMobile ? 18 : 0 }}
-                    resizeMode="contain"
-                  />
+                  {/* Estrela lateral em Desktop e Tablet */}
+                  {!isMobile && (
+                    <Image
+                      source={require('../img/estrelasIa.svg')}
+                      style={{ width: 130, height: 130 }}
+                      resizeMode="contain"
+                    />
+                  )}
                 </View>
 
+                {/* Card do Logótipo Branco */}
                 <View
                   style={{
-                    flex: 1,
                     backgroundColor: '#FFFFFF',
                     borderRadius: 24,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    padding: 40,
-                    minHeight: 240,
+                    padding: 32,
+                    minHeight: isMobile ? 160 : 200,
                     borderWidth: 1,
                     borderColor: '#F0F0F0',
                   }}
                 >
                   <Image
                     source={require('@/img/logotipoVitta.svg')}
-                    style={{ width: 180, height: 60 }}
+                    style={{ width: isMobile ? 140 : 180, height: 55 }}
                     resizeMode="contain"
                   />
                 </View>
@@ -635,16 +716,15 @@ export default function Index() {
           </View>
         </View>
 
-        {/* ─── 5. BANNER CTA ────────────────────────────────────────── */}
-        <View style={{ width: '100%', paddingHorizontal: sidePadding, paddingVertical: isMobile ? 40 : 48 }}>
+        {/* ─── 5. BANNER CTA ─── */}
+        <View style={{ width: '100%', paddingHorizontal: sidePadding, paddingVertical: isMobile ? 36 : 56 }}>
           <View
             style={{
               backgroundColor: colors.yellow2,
-              borderRadius: 32,
-              paddingVertical: isMobile ? 40 : 72,
-              paddingHorizontal: isMobile ? 24 : 0,
+              borderRadius: 28,
+              paddingVertical: isMobile ? 36 : 60,
+              paddingHorizontal: isMobile ? 20 : 36,
               alignItems: 'center',
-              overflow: 'hidden',
               justifyContent: 'center',
             }}
           >
@@ -652,12 +732,12 @@ export default function Index() {
               style={[
                 tipografia.h2,
                 {
-                  fontSize: isMobile ? 28 : 42,
+                  fontSize: isMobile ? 24 : isTablet ? 32 : 38,
                   textAlign: 'center',
-                  letterSpacing: -0.7,
+                  letterSpacing: -0.5,
                   maxWidth: 620,
                   color: colors.yellow9,
-                  lineHeight: isMobile ? 32 : 40,
+                  lineHeight: isMobile ? 30 : 42,
                 },
               ]}
             >
@@ -669,16 +749,18 @@ export default function Index() {
                 tipografia.caption,
                 {
                   textAlign: 'center',
-                  marginTop: 14,
-                  maxWidth: 480,
+                  marginTop: 12,
+                  maxWidth: 500,
                   color: colors.yellow9,
+                  fontSize: isMobile ? 13 : 14.5,
+                  lineHeight: 20,
                 },
               ]}
             >
               Tenha consultas, exames, medicamentos e informações importantes sempre ao seu alcance.
             </Text>
 
-            <View style={{ flexDirection: 'row', gap: 8, marginTop: 28 }}>
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
               <ButtonSecondary
                 texto="Entrar"
                 onPress={() => navegarPara('/login')}
@@ -693,24 +775,24 @@ export default function Index() {
           </View>
         </View>
 
-        {/* ─── 6. FOOTER ────────────────────────────────────────────── */}
+        {/* ─── 6. FOOTER ─── */}
         <View
           style={{
             width: '100%',
             backgroundColor: '#1E1E1E',
-            paddingVertical: 45,
+            paddingVertical: 36,
             paddingHorizontal: sidePadding,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Text style={tipografia.captionInverse}>
+          <Text style={[tipografia.captionInverse, { textAlign: 'center', fontSize: 13 }]}>
             © Elaborado pelos autores • vittaetec@gmail.com
           </Text>
         </View>
       </ScrollView>
 
-      {/* ─── MODAL DO MENU HAMBÚRGUER MOBILE ─────────────────────── */}
+      {/* ─── MODAL DO MENU HAMBÚRGUER MOBILE ─── */}
       <Modal
         animationType="fade"
         transparent
@@ -728,7 +810,7 @@ export default function Index() {
         >
           <View
             style={{
-              width: '78%',
+              width: '80%',
               maxWidth: 320,
               height: '100%',
               backgroundColor: '#FFFFFF',
@@ -753,13 +835,13 @@ export default function Index() {
               </TouchableOpacity>
             </View>
 
-            <View style={{ gap: 14 }}>
+            <View style={{ gap: 10 }}>
               {linksNavegacao.map((item) => (
                 <TouchableOpacity
                   key={item.rota}
                   onPress={() => navegarPara(item.rota)}
                   style={{
-                    paddingVertical: 10,
+                    paddingVertical: 12,
                     borderBottomWidth: 1,
                     borderBottomColor: '#F0F0F0',
                   }}
@@ -787,7 +869,6 @@ export default function Index() {
         </Pressable>
       </Modal>
 
-      {/* Modal Demo Vitta IA */}
       <VittaIADemoModal
         visivel={modalDemoAberto}
         onFechar={() => setModalDemoAberto(false)}

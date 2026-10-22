@@ -124,6 +124,7 @@ export default function RootLayout() {
         <Stack.Screen name="inicio" />
         <Stack.Screen name="recursos" />
         <Stack.Screen name="faq" />
+        <Stack.Screen name="saibaMais" />
         <Stack.Screen name="suporte" />
         <Stack.Screen name="termos" />
         <Stack.Screen name="privacidade" />

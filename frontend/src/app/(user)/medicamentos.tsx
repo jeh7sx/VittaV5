@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
   useWindowDimensions,
+  Platform,
 } from 'react-native';
 
 import ButtonPrimary from '@/components/Buttons/ButtonPrimary';
@@ -305,7 +306,7 @@ export default function Medicamentos() {
                 backgroundColor: theme.cardBg,
                 borderColor: theme.border,
                 borderWidth: 1,
-              },]}>
+              }]}>
                 <Text style={[styles.emptyStateText, { color: theme.textSecondary }]}>
                   Nenhum medicamento adicionado. Seus medicamentos adicionados serão exibidos aqui!
                 </Text>
@@ -522,21 +523,31 @@ export default function Medicamentos() {
             setModalCalendario({ visivel: true, campo, isEdit: false })
           }
         />
-        <View style={styles.acoesModal}>
+        <View
+          style={{
+            flexDirection: isNarrow ? 'column' : 'row',
+            alignItems: 'center',
+            gap: 12,
+            marginTop: 20,
+            paddingTop: 16,
+            borderTopWidth: 1,
+            borderTopColor: theme.border,
+          }}
+        >
           <ButtonSecondary
             texto="Cancelar"
             onPress={() => {
               limparFormCadastro();
               setModalCadastro(false);
             }}
-            style={{ width: '100%' }}
+            style={{ flex: isNarrow ? undefined : 1, width: isNarrow ? '100%' : 'auto' }}
             icone={require('@/img/icons/x.svg')}
           />
           <ButtonPrimary
             texto="Adicionar"
             onPress={cadastrarMedicamento}
             icone={require('@/img/icons/add-01.svg')}
-            style={{ width: '100%' }}
+            style={{ flex: isNarrow ? undefined : 1, width: isNarrow ? '100%' : 'auto' }}
           />
         </View>
       </ModalPadrao>
@@ -569,18 +580,28 @@ export default function Medicamentos() {
             setModalCalendario({ visivel: true, campo, isEdit: true })
           }
         />
-        <View style={styles.acoesModal}>
+        <View
+          style={{
+            flexDirection: isNarrow ? 'column' : 'row',
+            alignItems: 'center',
+            gap: 12,
+            marginTop: 20,
+            paddingTop: 16,
+            borderTopWidth: 1,
+            borderTopColor: theme.border,
+          }}
+        >
           <ButtonSecondary
             texto="Cancelar"
             onPress={() => setModalEditar(false)}
-            style={{ width: '100%' }}
+            style={{ flex: isNarrow ? undefined : 1, width: isNarrow ? '100%' : 'auto' }}
             icone={require('@/img/icons/x.svg')}
           />
           <ButtonPrimary
             texto="Salvar alterações"
             onPress={salvarEdicao}
             icone={require('@/img/icons/add-01.svg')}
-            style={{ width: '100%' }}
+            style={{ flex: isNarrow ? undefined : 1, width: isNarrow ? '100%' : 'auto' }}
           />
         </View>
       </ModalPadrao>
@@ -838,12 +859,19 @@ function FormMedicamento(props: any) {
   };
 
   return (
-    <ScrollView style={{ maxHeight: 680 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 20 }}>
+    <ScrollView
+      style={{ width: '100%' }}
+      contentContainerStyle={{ paddingRight: 4, paddingBottom: 10 }}
+      showsVerticalScrollIndicator={true}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 20 }}>
         <View style={{ backgroundColor: theme.bgMed, borderRadius: 999, padding: 8, justifyContent: 'center', alignItems: 'center' }}>
-          <Image source={require('@/img/icons/medicamento.svg')} style={{ width: 32, height: 32, tintColor: theme.Med }} />
+          <Image source={require('@/img/icons/medicamento.svg')} style={{ width: 28, height: 28, tintColor: theme.Med }} />
         </View>
-        <Text style={[tipografia.h2, { color: theme.textPrimary }]}>{isEdit ? 'Editar ' : 'Adicionar '}medicamento</Text>
+        <Text style={[tipografia.h2, { color: theme.textPrimary, fontSize: isNarrow ? 20 : 24 }]}>
+          {isEdit ? 'Editar ' : 'Adicionar '}medicamento
+        </Text>
       </View>
 
       <Campo label="Medicamento" obrigatorio placeholder="Ex: Dipirona" value={nome} onChangeText={setNome} theme={theme} />
@@ -1026,10 +1054,10 @@ function FormMedicamento(props: any) {
 
       {/* Fotos */}
       <Text style={[styles.label, { color: theme.textPrimary }]}>Fotos <Text style={{ color: theme.textSecondary, fontWeight: '400' }}>(Opcional, máx. {MAX_FOTOS})</Text></Text>
-      <View style={{ flexDirection: 'row', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
+      <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
         {fotos.map((f: any, i: any) => (
           <View key={i} style={{ position: 'relative' }}>
-            <Image source={{ uri: f }} style={{ width: 80, height: 80, borderRadius: 10, borderWidth: 1, borderColor: theme.border }} />
+            <Image source={{ uri: f }} style={{ width: 76, height: 76, borderRadius: 10, borderWidth: 1, borderColor: theme.border }} />
             <TouchableOpacity
               onPress={() => removerFoto(i, fotos, setFotos)}
               style={{ position: 'absolute', top: -6, right: -6, backgroundColor: '#D93025', borderRadius: 10, width: 20, height: 20, justifyContent: 'center', alignItems: 'center' }}
@@ -1049,10 +1077,10 @@ function FormMedicamento(props: any) {
         {fotos.length < MAX_FOTOS && (
           <TouchableOpacity
             onPress={() => escolherFoto(fotos, setFotos)}
-            style={{ padding: 24, borderRadius: 16, borderWidth: 2, borderColor: theme.border, borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center', backgroundColor: theme.inputBg }}
+            style={{ width: 76, height: 76, borderRadius: 12, borderWidth: 2, borderColor: theme.border, borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center', backgroundColor: theme.inputBg }}
           >
-            <Image source={require('@/img/icons/add-01.svg')} style={{ width: 24, height: 24, tintColor: theme.gray4 }} />
-            <Text style={[tipografia.bodySecondary, { color: theme.textSecondary }]}>Adicionar</Text>
+            <Image source={require('@/img/icons/add-01.svg')} style={{ width: 22, height: 22, tintColor: theme.gray4 }} />
+            <Text style={[tipografia.caption, { color: theme.textSecondary, fontSize: 11, marginTop: 2 }]}>Adicionar</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -1077,10 +1105,26 @@ function ModalVerMaisMed({
 
   return (
     <Modal animationType="fade" transparent visible={Boolean(modalVerMais)} onRequestClose={onFechar}>
-      <View style={[styles.modalOverlayFundo, { padding: isNarrow ? 12 : 20 }]}>
-        <View style={[styles.verMaisBox, { padding: isNarrow ? 20 : 24, backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-          <ScrollView style={{ maxHeight: isNarrow ? 460 : 540 }} showsVerticalScrollIndicator={false}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 18 }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.55)', justifyContent: 'center', alignItems: 'center', padding: isNarrow ? 12 : 24 }}>
+        <View
+          style={{
+            width: '100%',
+            maxWidth: 580,
+            maxHeight: '90%',
+            backgroundColor: theme.cardBg,
+            borderColor: theme.border,
+            borderWidth: 1,
+            borderRadius: 24,
+            padding: isNarrow ? 18 : 26,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 10 },
+            shadowOpacity: 0.15,
+            shadowRadius: 24,
+            elevation: 12,
+          }}
+        >
+          <ScrollView style={{ flexGrow: 0 }} showsVerticalScrollIndicator={false}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 16 }}>
               <View style={[styles.verMaisIconWrap, { backgroundColor: theme.bgMed }]}>
                 <Image source={require('@/img/icons/medicamento.svg')} style={{ width: 24, height: 24, tintColor: theme.Med }} />
               </View>
@@ -1095,7 +1139,7 @@ function ModalVerMaisMed({
 
             <View style={{ height: 1, backgroundColor: theme.border, marginBottom: 16 }} />
 
-            <View style={{ gap: 16, marginBottom: 16 }}>
+            <View style={{ gap: 14, marginBottom: 16 }}>
               {Boolean(medAtual?.tipo) && (
                 <InfoRow
                   icon={require('@/img/icons/medicamento.svg')}
@@ -1211,7 +1255,9 @@ function ModalVerMaisMed({
             )}
           </ScrollView>
 
-          <ButtonSecondary texto="Fechar" onPress={onFechar} icone={require('@/img/icons/x.svg')} style={{ width: '100%' }} />
+          <View style={{ marginTop: 14 }}>
+            <ButtonSecondary texto="Fechar" onPress={onFechar} icone={require('@/img/icons/x.svg')} style={{ width: '100%' }} />
+          </View>
         </View>
       </View>
     </Modal>
@@ -1229,7 +1275,18 @@ function ModalAcaoDose({ doseSelecionada, salvandoDose, theme, onConfirmar, onFe
   return (
     <Modal animationType="fade" transparent visible={Boolean(doseSelecionada)} onRequestClose={onFechar}>
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-        <View style={[styles.doseModalBox, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.doseModalBox,
+            {
+              backgroundColor: theme.cardBg,
+              borderColor: theme.border,
+              width: '100%',
+              maxWidth: 440,
+              borderRadius: 24,
+            },
+          ]}
+        >
           <View style={[styles.doseModalIconWrap, { backgroundColor: doseSelecionada.jaTomou ? '#DCFCE7' : theme.yellow1 }]}>
             <Image
               source={doseSelecionada.jaTomou ? require('@/img/icons/check.svg') : require('@/img/icons/medicamento.svg')}
@@ -1282,7 +1339,18 @@ function ModalSeletorData({ visivel, onFechar, onConfirmar, titulo }: any) {
   return (
     <Modal visible={visivel} transparent animationType="fade" onRequestClose={onFechar}>
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 16 }}>
-        <View style={[styles.modalCalendarioBox, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.modalCalendarioBox,
+            {
+              backgroundColor: theme.cardBg,
+              borderColor: theme.border,
+              width: '100%',
+              maxWidth: 420,
+              borderRadius: 24,
+            },
+          ]}
+        >
           <Text style={[tipografia.h3, { marginBottom: 16, textAlign: 'center', color: theme.textPrimary }]}>{titulo}</Text>
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -1370,11 +1438,49 @@ function EstadoVazio({ texto, theme }: { texto: string; theme: any }) {
   );
 }
 
-function ModalPadrao({ visible, onClose, isNarrow, theme, children }: { visible: boolean; onClose: () => void; isNarrow: boolean; theme: any; children: ReactNode }) {
+function ModalPadrao({
+  visible,
+  onClose,
+  isNarrow,
+  theme,
+  children,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  isNarrow: boolean;
+  theme: any;
+  children: ReactNode;
+}) {
   return (
     <Modal animationType="fade" transparent visible={visible} onRequestClose={onClose}>
-      <View style={[styles.modalOverlayFundo, { padding: isNarrow ? 12 : 20 }]}>
-        <View style={[styles.modalPadraoBox, { paddingHorizontal: isNarrow ? 20 : 40, paddingVertical: isNarrow ? 24 : 40, backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.55)',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: isNarrow ? 12 : 24,
+        }}
+      >
+        <View
+          style={{
+            width: '100%',
+            maxWidth: 580,
+            maxHeight: '90%',
+            backgroundColor: theme.cardBg,
+            borderColor: theme.border,
+            borderWidth: 1,
+            borderRadius: 24,
+            paddingHorizontal: isNarrow ? 18 : 28,
+            paddingVertical: isNarrow ? 20 : 28,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 12 },
+            shadowOpacity: 0.15,
+            shadowRadius: 28,
+            elevation: 12,
+            overflow: 'hidden',
+          }}
+        >
           {children}
         </View>
       </View>

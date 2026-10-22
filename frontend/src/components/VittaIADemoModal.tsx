@@ -86,11 +86,9 @@ export const VittaIADemoModal: React.FC<Props> = ({ visivel, onFechar }) => {
 					<View style={styles.topHeader}>
 						<View style={styles.headerBrand}>
 							<View style={styles.avatarIA}>
-								{/* <Text style={{ fontSize: 18 }}>💛</Text> */}
-
 								<Image
 									source={logoVittaIA}
-									style={{ width: 19, height: 19, tintColor: '#F7B500' }}
+									style={{ width: 19, height: 19, tintColor: '#F59E0B' }}
 								/>
 							</View>
 							<View style={styles.headerTextos}>
@@ -155,7 +153,7 @@ export const VittaIADemoModal: React.FC<Props> = ({ visivel, onFechar }) => {
 											<View style={styles.avatarMiniIA}>
 												<Image
 													source={logoVittaIA}
-													style={{ width: 19, height: 19, tintColor: '#F7B500' }}
+													style={{ width: 19, height: 19, tintColor: '#F59E0B' }}
 												/>
 											</View>
 										)}
@@ -327,9 +325,9 @@ const styles = StyleSheet.create({
 		width: 38,
 		height: 38,
 		borderRadius: 12,
-		backgroundColor: '#FFF4D6',
-		borderWidth: 1,
-		borderColor: '#F7B500',
+		// backgroundColor: '#FFF4D6',
+		// borderWidth: 1,
+		// borderColor: '#F7B500',
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
@@ -451,7 +449,7 @@ const styles = StyleSheet.create({
 		width: 24,
 		height: 24,
 		borderRadius: 8,
-		backgroundColor: '#FFF4D6',
+		// backgroundColor: '#FFF4D6',
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginTop: 2,
