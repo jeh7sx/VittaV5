@@ -154,7 +154,7 @@ const PASSOS_COMO_FUNCIONA = [
   {
     numero: '01',
     titulo: 'Cadastre o perfil',
-    descricao: 'Insira os dados essenciais da criança: idade, alergias, tipo sanguíneo e histórico relevante.',
+    descricao: 'Insira os dados essenciais da criança ou adolescente',
   },
   {
     numero: '02',
