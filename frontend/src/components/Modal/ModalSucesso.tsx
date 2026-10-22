@@ -39,7 +39,7 @@ export default function ModalSucesso({
   const { theme, isDark } = useTheme();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const onFecharRef = useRef(onFechar);
   const onVerMaisRef = useRef(onVerMais);

@@ -49,8 +49,8 @@ const MENU_CONTA: ItemMenu[] = [
   { label: 'Crianças e adolescentes', icone: require('@/img/icons/userGroup.svg'), rota: '/filhos' },
 ];
 
-const LARGURA_ABERTA = 286;
-const LARGURA_FECHADA = 84;
+const LARGURA_ABERTA_MAX = 270;
+const LARGURA_FECHADA = 76;
 const BREAKPOINT_DESKTOP = 768;
 const STORAGE_KEY = '@vitta_user_sidebar_aberta';
 const STORAGE_POSICAO_Y = '@vitta_sidebar_btn_pos_y';
@@ -63,13 +63,13 @@ interface UsuarioLogado {
 
 export default function Sidebar() {
   const { filhos, filhoSelecionado, setFilhoSelecionado } = useFilho();
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
 
   const pathname = usePathname();
   const { width, height } = useWindowDimensions();
 
   const isDesktop = width >= BREAKPOINT_DESKTOP;
-  const topoSeguro = Platform.OS === 'android' ? StatusBar.currentHeight || 16 : 16;
+  const topoSeguro = Platform.OS === 'android' ? (StatusBar.currentHeight || 16) + 8 : 16;
 
   const [aberta, setAberta] = useState(true);
   const [modalVisivel, setModalVisivel] = useState(false);
@@ -82,7 +82,6 @@ export default function Sidebar() {
     fotoUri: null,
   });
 
-  // Animação e arrasto do botão flutuante mobile
   const panY = useRef(new Animated.Value(topoSeguro)).current;
   const ultimoY = useRef(topoSeguro);
 
@@ -102,7 +101,7 @@ export default function Sidebar() {
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (_, gestureState) => {
-        return Math.abs(gestureState.dy) > 6;
+        return Math.abs(gestureState.dy) > 10;
       },
       onPanResponderGrant: () => {
         panY.setOffset(ultimoY.current);
@@ -113,9 +112,8 @@ export default function Sidebar() {
         panY.flattenOffset();
         let destino = ultimoY.current + gestureState.dy;
 
-        // Limita o movimento dentro dos limites visíveis do ecrã
         const minTop = topoSeguro;
-        const maxTop = height - 90;
+        const maxTop = height - 70;
 
         if (destino < minTop) destino = minTop;
         if (destino > maxTop) destino = maxTop;
@@ -213,465 +211,481 @@ export default function Sidebar() {
 
   const isAtivo = (rota: string) => pathname === rota || pathname.startsWith(rota + '/');
 
-  function ConteudoSidebar() {
-    const larguraEfetiva = !isDesktop
-      ? Math.min(width * 0.82, LARGURA_ABERTA)
-      : aberta
-        ? LARGURA_ABERTA
-        : LARGURA_FECHADA;
+  const larguraEfetiva = !isDesktop
+    ? Math.min(width * 0.78, LARGURA_ABERTA_MAX)
+    : aberta
+      ? Math.min(Math.max(width * 0.18, 220), LARGURA_ABERTA_MAX)
+      : LARGURA_FECHADA;
 
-    const exibirTexto = !isDesktop || aberta;
-    const { isDark } = useTheme();
-    const configAtivo = isAtivo('/configuracoes');
-    const hoverConfig = itemHover === '__config_btn__';
+  const exibirTexto = !isDesktop || aberta;
+  const configAtivo = isAtivo('/configuracoes');
+  const hoverConfig = itemHover === '__config_btn__';
 
-    return (
-      <View
-        style={{
+  // Conteúdo isolado sem reinicializações destrutivas de Scroll
+  const renderCorpoSidebar = () => (
+    <View
+      style={[
+        {
           width: larguraEfetiva,
           height: '100%',
           backgroundColor: theme.bg,
-          paddingVertical: 16,
-          paddingHorizontal: exibirTexto ? 16 : 10,
+          paddingVertical: 12,
+          paddingHorizontal: exibirTexto ? 12 : 8,
+          borderRightWidth: isDesktop ? 1 : 0,
+          borderColor: theme.border,
+          flexDirection: 'column',
+        },
+        Platform.OS === 'web' && ({
+          overscrollBehavior: 'contain',
+        } as any),
+      ]}
+    >
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        overScrollMode="never"
+        nestedScrollEnabled
+        style={[
+          { flex: 1 },
+          Platform.OS === 'web' && ({
+            overscrollBehavior: 'contain',
+            overflowY: 'auto',
+            touchAction: 'pan-y',
+          } as any),
+        ]}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'flex-start',
+          paddingBottom: 24,
         }}
       >
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            flexGrow: 1,
-            justifyContent: 'space-between',
-            gap: 16,
-          }}
-        >
-          {/* BLOCO SUPERIOR */}
-          <View style={{ gap: 24 }}>
-            {/* Topo: Marca e Toggle */}
-            <View
+        {/* BLOCO SUPERIOR */}
+        <View style={{ gap: 16 }}>
+          {/* Topo: Marca e Toggle */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: exibirTexto ? 'space-between' : 'center',
+              minHeight: 36,
+              paddingTop: !isDesktop ? topoSeguro : 4,
+            }}
+          >
+            {exibirTexto && (
+              <Image
+                source={
+                  isDark
+                    ? require('@/img/logotipo/vittaBlack.svg')
+                    : require('@/img/logotipo/vittaWhite.svg')
+                }
+                style={{ width: 84, height: 28, resizeMode: 'contain' }}
+              />
+            )}
+
+            <TouchableOpacity
+              onPress={toggleSidebar}
+              accessibilityLabel="Alternar menu"
               style={{
-                flexDirection: 'row',
+                width: 34,
+                height: 34,
+                borderRadius: 17,
+                justifyContent: 'center',
                 alignItems: 'center',
-                justifyContent: exibirTexto ? 'space-between' : 'center',
-                minHeight: 36,
-                paddingTop: !isDesktop ? topoSeguro : 0,
+                backgroundColor: theme.inputBg,
               }}
             >
-              {exibirTexto && (
-                <Image
-                  source={
-                    isDark
-                      ? require('@/img/logotipo/vittaBlack.svg')
-                      : require('@/img/logotipo/vittaWhite.svg')
-                  }
-                  style={{ width: 92, height: 32, resizeMode: 'contain' }}
-                />
-              )}
+              <Image
+                source={
+                  exibirTexto
+                    ? require('@/img/icons/sideBar.svg')
+                    : require('@/img/icons/sideBarClosed.svg')
+                }
+                style={{ width: 18, height: 18, tintColor: theme.yellow5 }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
 
-              <TouchableOpacity
-                onPress={toggleSidebar}
-                accessibilityLabel="Alternar menu"
+          {/* Card Selecionar Filho */}
+          <TouchableOpacity
+            onPress={() => setModalVisivel(true)}
+            style={{
+              backgroundColor: theme.cardBg,
+              borderRadius: 999,
+              paddingVertical: exibirTexto ? 8 : 6,
+              paddingHorizontal: exibirTexto ? 10 : 6,
+              borderWidth: 1,
+              borderColor: theme.border,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: exibirTexto ? 8 : 0,
+              justifyContent: exibirTexto ? 'space-between' : 'center',
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+              <View
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 18,
+                  width: 30,
+                  height: 30,
+                  borderRadius: 999,
+                  backgroundColor: theme.inputBg,
+                  overflow: 'hidden',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  backgroundColor: theme.inputBg,
+                  flexShrink: 0,
                 }}
               >
-                <Image
-                  source={
-                    exibirTexto
-                      ? require('@/img/icons/sideBar.svg')
-                      : require('@/img/icons/sideBarClosed.svg')
-                  }
-                  style={{ width: 20, height: 20, tintColor: theme.textSecondary }}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Card Selecionar Filho */}
-            <TouchableOpacity
-              onPress={() => setModalVisivel(true)}
-              style={{
-                backgroundColor: theme.cardBg,
-                borderRadius: 999,
-                paddingVertical: exibirTexto ? 12 : 8,
-                paddingHorizontal: exibirTexto ? 14 : 8,
-                borderWidth: 1,
-                borderColor: theme.border,
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: exibirTexto ? 8 : 0,
-                justifyContent: exibirTexto ? 'space-between' : 'center',
-              }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
-                <View
-                  style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 999,
-                    backgroundColor: theme.inputBg,
-                    overflow: 'hidden',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  {fotoFilho ? (
-                    <Image source={{ uri: fotoFilho }} style={{ width: '100%', height: '100%' }} />
-                  ) : (
-                    <Image source={filhoIcon} style={{ width: 20, height: 20 }} />
-                  )}
-                </View>
-
-                {exibirTexto && (
-                  <View style={{ flex: 1, minWidth: 0 }}>
-                    {!filhoSelecionado ? (
-                      <ActivityIndicator size="small" color={theme.yellow5} />
-                    ) : (
-                      <Text
-                        style={[tipografia.body, { fontWeight: '600', fontSize: 14, color: theme.yellow5 }]}
-                        numberOfLines={1}
-                      >
-                        {filhoSelecionado?.nome ?? 'Selecionar filho'}
-                      </Text>
-                    )}
-                  </View>
+                {fotoFilho ? (
+                  <Image source={{ uri: fotoFilho }} style={{ width: '100%', height: '100%' }} />
+                ) : (
+                  <Image source={filhoIcon} style={{ width: 18, height: 18 }} />
                 )}
               </View>
 
               {exibirTexto && (
-                <Image
-                  source={require('@/img/icons/setaDireita.svg')}
-                  style={{ width: 14, height: 14, tintColor: theme.gray4 }}
-                  resizeMode="contain"
-                />
-              )}
-            </TouchableOpacity>
-
-            {/* Menu Principal */}
-            <View style={{ gap: 4 }}>
-              {MENU_PRINCIPAL.map((item) => {
-                const ativo = isAtivo(item.rota);
-                const hover = itemHover === item.rota;
-
-                return (
-                  <Pressable
-                    key={item.rota}
-                    onPress={() => router.push(item.rota as any)}
-                    onHoverIn={() => setItemHover(item.rota)}
-                    onHoverOut={() => setItemHover(null)}
-                    style={({ pressed }) => ({
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: exibirTexto ? 14 : 0,
-                      justifyContent: exibirTexto ? 'flex-start' : 'center',
-                      paddingVertical: 12,
-                      paddingHorizontal: exibirTexto ? 14 : 8,
-                      borderRadius: 999,
-                      backgroundColor: ativo
-                        ? theme.yellow5
-                        : hover
-                          ? theme.yellow2
-                          : 'transparent',
-                      opacity: pressed ? 0.75 : 1,
-                    })}
-                  >
-                    <View
-                      style={{
-                        width: 24,
-                        height: 24,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  {!filhoSelecionado ? (
+                    <ActivityIndicator size="small" color={theme.yellow5} />
+                  ) : (
+                    <Text
+                      style={[tipografia.body, { fontWeight: '600', fontSize: 13, color: theme.yellow5 }]}
+                      numberOfLines={1}
                     >
-                      <Image
-                        source={item.icone}
-                        style={{
-                          width: 22,
-                          height: 22,
-                          tintColor: ativo || hover ? (theme.modo === 'escuro' ? '#000' : theme.yellow9) : theme.gray4,
-                        }}
-                        resizeMode="contain"
-                      />
-                    </View>
-
-                    {exibirTexto && (
-                      <Text
-                        style={[
-                          tipografia.body,
-                          {
-                            fontSize: 14,
-                            fontWeight: ativo ? '700' : hover ? '500' : '400',
-                            color: ativo || hover ? (theme.modo === 'escuro' ? '#000' : theme.yellow9) : theme.gray4,
-                          },
-                        ]}
-                      >
-                        {item.label}
-                      </Text>
-                    )}
-                  </Pressable>
-                );
-              })}
+                      {filhoSelecionado?.nome ?? 'Selecionar filho'}
+                    </Text>
+                  )}
+                </View>
+              )}
             </View>
 
-            {/* Seção Conta */}
-            <View style={{ gap: 4, marginTop: 4 }}>
+            {exibirTexto && (
+              <Image
+                source={require('@/img/icons/setaDireita.svg')}
+                style={{ width: 12, height: 12, tintColor: theme.gray4 }}
+                resizeMode="contain"
+              />
+            )}
+          </TouchableOpacity>
+
+          {/* Menu Principal */}
+          <View style={{ gap: 2 }}>
+            {MENU_PRINCIPAL.map((item) => {
+              const ativo = isAtivo(item.rota);
+              const hover = itemHover === item.rota;
+
+              return (
+                <Pressable
+                  key={item.rota}
+                  onPress={() => router.push(item.rota as any)}
+                  onHoverIn={() => setItemHover(item.rota)}
+                  onHoverOut={() => setItemHover(null)}
+                  style={({ pressed }) => ({
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: exibirTexto ? 12 : 0,
+                    justifyContent: exibirTexto ? 'flex-start' : 'center',
+                    paddingVertical: 10,
+                    paddingHorizontal: exibirTexto ? 12 : 6,
+                    borderRadius: 999,
+                    backgroundColor: ativo
+                      ? theme.yellow5
+                      : hover
+                        ? theme.yellow2
+                        : 'transparent',
+                    opacity: pressed ? 0.75 : 1,
+                  })}
+                >
+                  <View
+                    style={{
+                      width: 22,
+                      height: 22,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Image
+                      source={item.icone}
+                      style={{
+                        width: 20,
+                        height: 20,
+                        tintColor: ativo || hover ? (theme.modo === 'escuro' ? '#000' : theme.yellow9) : theme.gray4,
+                      }}
+                      resizeMode="contain"
+                    />
+                  </View>
+
+                  {exibirTexto && (
+                    <Text
+                      style={[
+                        tipografia.body,
+                        {
+                          fontSize: 13.5,
+                          fontWeight: ativo ? '700' : hover ? '500' : '400',
+                          color: ativo || hover ? (theme.modo === 'escuro' ? '#000' : theme.yellow9) : theme.gray4,
+                        },
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
+
+          {/* Seção Conta */}
+          <View style={{ gap: 2, marginTop: 2 }}>
+            {exibirTexto && (
+              <Text
+                style={[
+                  tipografia.caption,
+                  {
+                    fontSize: 11,
+                    marginBottom: 2,
+                    paddingHorizontal: 8,
+                    color: theme.gray4,
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                  },
+                ]}
+              >
+                Conta
+              </Text>
+            )}
+
+            {MENU_CONTA.map((item) => {
+              const ativo = isAtivo(item.rota);
+              const hover = itemHover === item.rota;
+
+              return (
+                <Pressable
+                  key={item.rota}
+                  onPress={() => router.push(item.rota as any)}
+                  onHoverIn={() => setItemHover(item.rota)}
+                  onHoverOut={() => setItemHover(null)}
+                  style={({ pressed }) => ({
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: exibirTexto ? 12 : 0,
+                    justifyContent: exibirTexto ? 'flex-start' : 'center',
+                    paddingVertical: 10,
+                    paddingHorizontal: exibirTexto ? 12 : 6,
+                    borderRadius: 999,
+                    backgroundColor: ativo
+                      ? theme.yellow5
+                      : hover
+                        ? theme.yellow2
+                        : 'transparent',
+                    opacity: pressed ? 0.75 : 1,
+                  })}
+                >
+                  <View
+                    style={{
+                      width: 20,
+                      height: 20,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Image
+                      source={item.icone}
+                      style={{
+                        width: 18,
+                        height: 18,
+                        tintColor: ativo || hover ? (theme.modo === 'escuro' ? '#000' : theme.yellow9) : theme.gray4,
+                      }}
+                      resizeMode="contain"
+                    />
+                  </View>
+
+                  {exibirTexto && (
+                    <Text
+                      style={[
+                        tipografia.body,
+                        {
+                          fontSize: 13.5,
+                          fontWeight: ativo ? '700' : hover ? '500' : '400',
+                          color: ativo || hover ? (theme.modo === 'escuro' ? '#000' : theme.yellow9) : theme.gray4,
+                        },
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* BLOCO INFERIOR: Configurações + Perfil (no final do fluxo de rolagem) */}
+        <View style={{ gap: 8, paddingTop: 24, marginTop: 'auto' }}>
+          <Pressable
+            onPress={() => router.push('/(user)/configuracoes')}
+            onHoverIn={() => setItemHover('__config_btn__')}
+            onHoverOut={() => setItemHover(null)}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir configurações"
+            style={({ pressed }) => ({
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: configAtivo
+                ? theme.yellow5
+                : hoverConfig
+                  ? theme.yellow1
+                  : theme.cardBg,
+              borderRadius: 999,
+              paddingVertical: 8,
+              paddingHorizontal: exibirTexto ? 12 : 6,
+              borderWidth: 1,
+              borderColor: configAtivo || hoverConfig ? theme.yellow5 : theme.border,
+              justifyContent: exibirTexto ? 'space-between' : 'center',
+              opacity: pressed ? 0.82 : 1,
+            })}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Image
+                source={require('@/img/icons/config.svg')}
+                style={{
+                  width: 18,
+                  height: 18,
+                  tintColor: configAtivo
+                    ? (theme.modo === 'escuro' ? '#000' : theme.yellow9)
+                    : theme.textPrimary,
+                }}
+                resizeMode="contain"
+              />
               {exibirTexto && (
                 <Text
                   style={[
-                    tipografia.caption,
+                    tipografia.body,
                     {
-                      fontSize: 12,
-                      marginBottom: 4,
-                      paddingHorizontal: 8,
-                      color: theme.gray4,
-                      textTransform: 'uppercase',
-                      letterSpacing: 0.5,
+                      fontSize: 12.5,
+                      fontWeight: configAtivo ? '700' : '600',
+                      color: configAtivo
+                        ? (theme.modo === 'escuro' ? '#000' : theme.yellow9)
+                        : theme.textPrimary,
                     },
                   ]}
+                  numberOfLines={1}
                 >
-                  Conta
+                  Configurações
                 </Text>
               )}
-
-              {MENU_CONTA.map((item) => {
-                const ativo = isAtivo(item.rota);
-                const hover = itemHover === item.rota;
-
-                return (
-                  <Pressable
-                    key={item.rota}
-                    onPress={() => router.push(item.rota as any)}
-                    onHoverIn={() => setItemHover(item.rota)}
-                    onHoverOut={() => setItemHover(null)}
-                    style={({ pressed }) => ({
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: exibirTexto ? 14 : 0,
-                      justifyContent: exibirTexto ? 'flex-start' : 'center',
-                      paddingVertical: 12,
-                      paddingHorizontal: exibirTexto ? 14 : 8,
-                      borderRadius: 999,
-                      backgroundColor: ativo
-                        ? theme.yellow5
-                        : hover
-                          ? theme.yellow2
-                          : 'transparent',
-                      opacity: pressed ? 0.75 : 1,
-                    })}
-                  >
-                    <View
-                      style={{
-                        width: 22,
-                        height: 22,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <Image
-                        source={item.icone}
-                        style={{
-                          width: 20,
-                          height: 20,
-                          tintColor: ativo || hover ? (theme.modo === 'escuro' ? '#000' : theme.yellow9) : theme.gray4,
-                        }}
-                        resizeMode="contain"
-                      />
-                    </View>
-
-                    {exibirTexto && (
-                      <Text
-                        style={[
-                          tipografia.body,
-                          {
-                            fontSize: 14,
-                            fontWeight: ativo ? '700' : hover ? '500' : '400',
-                            color: ativo || hover ? (theme.modo === 'escuro' ? '#000' : theme.yellow9) : theme.gray4,
-                          },
-                        ]}
-                      >
-                        {item.label}
-                      </Text>
-                    )}
-                  </Pressable>
-                );
-              })}
             </View>
-          </View>
 
-          {/* BLOCO INFERIOR: Botão de Configurações + Perfil */}
-          <View style={{ gap: 10, paddingTop: 12 }}>
-            {/* Botão de Configurações */}
-            <Pressable
-              onPress={() => router.push('/(user)/configuracoes')}
-              onHoverIn={() => setItemHover('__config_btn__')}
-              onHoverOut={() => setItemHover(null)}
-              accessibilityRole="button"
-              accessibilityLabel="Abrir configurações"
-              style={({ pressed }) => ({
+            {exibirTexto && (
+              <Image
+                source={require('@/img/icons/setaDireita.svg')}
+                style={{
+                  width: 12,
+                  height: 12,
+                  tintColor: configAtivo
+                    ? (theme.modo === 'escuro' ? '#000' : theme.gray4)
+                    : theme.gray4,
+                }}
+                resizeMode="contain"
+              />
+            )}
+          </Pressable>
+
+          {/* Perfil */}
+          <Pressable
+            onPress={() => router.push('/perfil' as any)}
+            onHoverIn={() => setItemHover('__perfil_card__')}
+            onHoverOut={() => setItemHover(null)}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir perfil"
+            style={({ pressed }) => {
+              const hoverPerfil = itemHover === '__perfil_card__';
+              const perfilAtivo = isAtivo('/perfil');
+
+              return {
                 flexDirection: 'row',
                 alignItems: 'center',
-                backgroundColor: configAtivo
-                  ? theme.yellow5
-                  : hoverConfig
+                backgroundColor: perfilAtivo
+                  ? theme.yellow1
+                  : hoverPerfil
                     ? theme.yellow1
                     : theme.cardBg,
                 borderRadius: 999,
-                paddingVertical: 10,
-                paddingHorizontal: exibirTexto ? 14 : 8,
+                padding: exibirTexto ? 8 : 6,
                 borderWidth: 1,
-                borderColor: configAtivo || hoverConfig ? theme.yellow5 : theme.border,
+                borderColor:
+                  perfilAtivo || hoverPerfil ? theme.yellow5 : theme.border,
                 justifyContent: exibirTexto ? 'space-between' : 'center',
                 opacity: pressed ? 0.82 : 1,
-              })}
+              };
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 8,
+                flex: 1,
+                minWidth: 0,
+              }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <Image
-                  source={require('@/img/icons/config.svg')}
-                  style={{
-                    width: 20,
-                    height: 20,
-                    tintColor: configAtivo
-                      ? (theme.modo === 'escuro' ? '#000' : theme.yellow9)
-                      : theme.textPrimary,
-                  }}
-                  resizeMode="contain"
-                />
-                {exibirTexto && (
-                  <Text
-                    style={[
-                      tipografia.body,
-                      {
-                        fontSize: 13,
-                        fontWeight: configAtivo ? '700' : '600',
-                        color: configAtivo
-                          ? (theme.modo === 'escuro' ? '#000' : theme.yellow9)
-                          : theme.textPrimary,
-                      },
-                    ]}
-                    numberOfLines={1}
-                  >
-                    Configurações
+              <View
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 999,
+                  backgroundColor: theme.inputBg,
+                  overflow: 'hidden',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                {usuarioLogado.fotoUri ? (
+                  <Image
+                    source={{ uri: usuarioLogado.fotoUri }}
+                    style={{ width: '100%', height: '100%' }}
+                  />
+                ) : (
+                  <Text style={[tipografia.body, { color: theme.textPrimary, fontSize: 12 }]}>
+                    {usuarioLogado.nome.charAt(0).toUpperCase()}
                   </Text>
                 )}
               </View>
 
               {exibirTexto && (
-                <Image
-                  source={require('@/img/icons/setaDireita.svg')}
-                  style={{
-                    width: 14,
-                    height: 14,
-                    tintColor: configAtivo
-                      ? (theme.modo === 'escuro' ? '#000' : theme.gray4)
-                      : theme.gray4,
-                  }}
-                  resizeMode="contain"
-                />
-              )}
-            </Pressable>
-
-            {/* Perfil */}
-            <Pressable
-              onPress={() => router.push('/perfil' as any)}
-              onHoverIn={() => setItemHover('__perfil_card__')}
-              onHoverOut={() => setItemHover(null)}
-              accessibilityRole="button"
-              accessibilityLabel="Abrir perfil"
-              style={({ pressed }) => {
-                const hoverPerfil = itemHover === '__perfil_card__';
-                const perfilAtivo = isAtivo('/perfil');
-
-                return {
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: perfilAtivo
-                    ? theme.yellow1
-                    : hoverPerfil
-                      ? theme.yellow1
-                      : theme.cardBg,
-                  borderRadius: 999,
-                  padding: exibirTexto ? 10 : 8,
-                  borderWidth: 1,
-                  borderColor:
-                    perfilAtivo || hoverPerfil ? theme.yellow5 : theme.border,
-                  justifyContent: exibirTexto ? 'space-between' : 'center',
-                  opacity: pressed ? 0.82 : 1,
-                };
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 10,
-                  flex: 1,
-                  minWidth: 0,
-                }}
-              >
-                <View
-                  style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 999,
-                    backgroundColor: theme.inputBg,
-                    overflow: 'hidden',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  {usuarioLogado.fotoUri ? (
-                    <Image
-                      source={{ uri: usuarioLogado.fotoUri }}
-                      style={{ width: '100%', height: '100%' }}
-                    />
-                  ) : (
-                    <Text style={[tipografia.body, { color: theme.textPrimary }]}>
-                      {usuarioLogado.nome.charAt(0).toUpperCase()}
-                    </Text>
-                  )}
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text
+                    style={[{ fontWeight: '600', fontSize: 12.5 }, tipografia.body, { color: theme.textPrimary }]}
+                    numberOfLines={1}
+                  >
+                    {usuarioLogado.nome}
+                  </Text>
+                  <Text
+                    style={[tipografia.caption, { fontSize: 10.5, color: theme.gray4 }]}
+                    numberOfLines={1}
+                  >
+                    {usuarioLogado.email}
+                  </Text>
                 </View>
-
-                {exibirTexto && (
-                  <View style={{ flex: 1, minWidth: 0 }}>
-                    <Text
-                      style={[{ fontWeight: '600', fontSize: 13 }, tipografia.body, { color: theme.textPrimary }]}
-                      numberOfLines={1}
-                    >
-                      {usuarioLogado.nome}
-                    </Text>
-                    <Text
-                      style={[tipografia.caption, { fontSize: 11, color: theme.gray4 }]}
-                      numberOfLines={1}
-                    >
-                      {usuarioLogado.email}
-                    </Text>
-                  </View>
-                )}
-              </View>
-
-              {exibirTexto && (
-                <TouchableOpacity
-                  onPress={(event) => {
-                    event.stopPropagation();
-                    sair();
-                  }}
-                  accessibilityLabel="Terminar sessão"
-                  style={{ padding: 4 }}
-                >
-                  <IconLogout color={theme.gray4} />
-                </TouchableOpacity>
               )}
-            </Pressable>
-          </View>
-        </ScrollView>
-      </View>
-    );
-  }
+            </View>
+
+            {exibirTexto && (
+              <TouchableOpacity
+                onPress={(event) => {
+                  event.stopPropagation();
+                  sair();
+                }}
+                accessibilityLabel="Terminar sessão"
+                style={{ padding: 4 }}
+              >
+                <IconLogout color={theme.gray4} />
+              </TouchableOpacity>
+            )}
+          </Pressable>
+        </View>
+      </ScrollView>
+    </View>
+  );
 
   function ModalFilho() {
     return (
@@ -695,10 +709,10 @@ export default function Sidebar() {
           <View
             style={{
               position: isDesktop ? 'absolute' : 'relative',
-              top: isDesktop ? 96 : undefined,
+              top: isDesktop ? 90 : undefined,
               left: isDesktop ? (aberta ? 20 : LARGURA_FECHADA + 10) : undefined,
-              width: isDesktop ? 260 : '90%',
-              maxWidth: 340,
+              width: isDesktop ? 250 : '90%',
+              maxWidth: 320,
               backgroundColor: theme.cardBg,
               borderRadius: 18,
               borderWidth: 1,
@@ -735,7 +749,7 @@ export default function Sidebar() {
               <FlatList
                 data={filhos}
                 keyExtractor={(item) => item.id}
-                style={{ maxHeight: 280 }}
+                style={{ maxHeight: 260 }}
                 renderItem={({ item }) => {
                   const sel = filhoSelecionado?.id === item.id;
                   return (
@@ -746,7 +760,7 @@ export default function Sidebar() {
                         alignItems: 'center',
                         gap: 10,
                         paddingHorizontal: 16,
-                        paddingVertical: 14,
+                        paddingVertical: 12,
                         backgroundColor: sel ? theme.yellow2 : theme.cardBg,
                         borderTopWidth: 1,
                         borderColor: theme.border,
@@ -782,7 +796,7 @@ export default function Sidebar() {
   if (isDesktop) {
     return (
       <>
-        <ConteudoSidebar />
+        {renderCorpoSidebar()}
         <ModalFilho />
       </>
     );
@@ -790,7 +804,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Botão Flutuante Móvel com Opacidade Reduzida e Arraste Vertical */}
       <Animated.View
         {...panResponder.panHandlers}
         style={{
@@ -798,17 +811,17 @@ export default function Sidebar() {
           top: panY,
           left: 12,
           zIndex: 200,
-          opacity: 0.65, // Opacidade reduzida para ver através
+          opacity: 0.75,
         }}
       >
         <TouchableOpacity
           onPress={toggleSidebar}
           activeOpacity={0.7}
           style={{
-            width: 42,
-            height: 42,
-            borderRadius: 14,
-            backgroundColor: theme.modo === 'escuro' ? 'rgba(30, 30, 30, 0.75)' : 'rgba(255, 255, 255, 0.75)',
+            width: 40,
+            height: 40,
+            borderRadius: 12,
+            backgroundColor: theme.modo === 'escuro' ? 'rgba(30, 30, 30, 0.85)' : 'rgba(255, 255, 255, 0.85)',
             borderWidth: 1,
             borderColor: theme.yellow5,
             justifyContent: 'center',
@@ -822,7 +835,7 @@ export default function Sidebar() {
         >
           <Image
             source={require('@/img/icons/sideBarClosed.svg')}
-            style={{ width: 20, height: 20, tintColor: theme.textSecondary }}
+            style={{ width: 18, height: 18, tintColor: theme.yellow5 }}
             resizeMode="contain"
           />
         </TouchableOpacity>
@@ -831,34 +844,40 @@ export default function Sidebar() {
       {aberta && (
         <Pressable
           onPress={() => setAberta(false)}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.45)',
-            zIndex: 299,
-          }}
+          style={[
+            {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.45)',
+              zIndex: 299,
+            },
+            Platform.OS === 'web' && ({ overscrollBehavior: 'contain' } as any),
+          ]}
         />
       )}
 
       {aberta && (
         <View
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            bottom: 0,
-            zIndex: 300,
-            shadowColor: '#000',
-            shadowOffset: { width: 4, height: 0 },
-            shadowOpacity: 0.2,
-            shadowRadius: 16,
-            elevation: 20,
-          }}
+          style={[
+            {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              zIndex: 300,
+              shadowColor: '#000',
+              shadowOffset: { width: 4, height: 0 },
+              shadowOpacity: 0.2,
+              shadowRadius: 16,
+              elevation: 20,
+            },
+            Platform.OS === 'web' && ({ overscrollBehavior: 'contain' } as any),
+          ]}
         >
-          <ConteudoSidebar />
+          {renderCorpoSidebar()}
         </View>
       )}
 

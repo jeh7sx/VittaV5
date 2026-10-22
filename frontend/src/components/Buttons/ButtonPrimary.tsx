@@ -17,6 +17,7 @@ interface ButtonPrimaryProps {
   onPress: () => void;
   icone?: ImageSourcePropType;
   style?: StyleProp<ViewStyle>;
+  disabled?: boolean;
 }
 
 export default function ButtonPrimary({
@@ -24,6 +25,7 @@ export default function ButtonPrimary({
   onPress,
   icone,
   style,
+  disabled = false,
 }: ButtonPrimaryProps) {
   const themeContext = useTheme();
 
@@ -37,7 +39,7 @@ export default function ButtonPrimary({
   const animTranslateY = useRef(new Animated.Value(0)).current;
 
   function handleHoverIn() {
-    if (Platform.OS !== 'web') return;
+    if (Platform.OS !== 'web' || disabled) return;
     Animated.parallel([
       Animated.timing(animScale, {
         toValue: 1.03,
@@ -53,7 +55,7 @@ export default function ButtonPrimary({
   }
 
   function handleHoverOut() {
-    if (Platform.OS !== 'web') return;
+    if (Platform.OS !== 'web' || disabled) return;
     Animated.parallel([
       Animated.timing(animScale, {
         toValue: 1,
@@ -74,51 +76,61 @@ export default function ButtonPrimary({
     <Animated.View
       style={[
         {
+          minWidth: 0,
           transform: [
             { translateY: animTranslateY },
             { scale: animScale },
           ],
         },
+        style, // O flex: 1 agora é aplicado aqui no elemento mais externo!
       ]}
     >
       <Pressable
         onPress={onPress}
+        disabled={disabled}
         onHoverIn={handleHoverIn}
         onHoverOut={handleHoverOut}
         style={[
           {
+            width: '100%',
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 8,
+            gap: 6,
             backgroundColor: theme.yellow5,
             borderRadius: 999,
-            paddingHorizontal: 32,
-            paddingVertical: 16,
-            ...(Platform.OS === 'web' && {
-              cursor: 'pointer',
-            }),
+            paddingHorizontal: 12,
+            paddingVertical: 12,
+            opacity: disabled ? 0.7 : 1,
           },
-          style,
+          Platform.OS === 'web' && ({
+            cursor: disabled ? 'not-allowed' : 'pointer',
+          } as any),
         ]}
       >
         {icone && (
           <Image
             source={icone}
             style={{
-              width: 24,
-              height: 24,
+              width: 18,
+              height: 18,
               tintColor: corTextoIcone,
+              flexShrink: 0,
             }}
             resizeMode="contain"
           />
         )}
 
         <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.85}
           style={[
             tipografia.buttonDark,
             {
               color: corTextoIcone,
+              flexShrink: 1,
+              textAlign: 'center',
             },
           ]}
         >

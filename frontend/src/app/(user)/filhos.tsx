@@ -120,7 +120,7 @@ export default function Filhos() {
           if (userSnap.exists()) {
             mapa[uid] = userSnap.data().nome || userSnap.data().email || 'Responsável';
           }
-        } catch (e) {}
+        } catch (e) { }
       }
       setNomesResponsaveis(mapa);
     }
@@ -704,18 +704,26 @@ export default function Filhos() {
               </View>
             </View>
 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8, marginTop: 14 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 8,
+                marginTop: 14,
+                width: '100%',
+              }}
+            >
               <ButtonSecondary
                 texto="Cancelar"
                 onPress={() => setModalConvidarAberto(false)}
                 icone={require('@/img/icons/x.svg')}
-                style={{ width: '48%' }}
+                style={{ flex: 1 }}
               />
               <ButtonPrimary
-                texto={enviando ? 'Enviando...' : 'Enviar convite'}
+                texto={enviando ? 'Enviando...' : 'Convidar'}
                 onPress={handleDispararConvite}
                 icone={require('@/img/icons/save.svg')}
-                style={{ width: '48%' }}
+                style={{ flex: 1 }}
               />
             </View>
           </View>
@@ -943,8 +951,8 @@ function ModalFilho({
                   salvando
                     ? 'Salvando...'
                     : titulo === 'Editar '
-                    ? 'Salvar alterações'
-                    : 'Cadastrar'
+                      ? 'Salvar alterações'
+                      : 'Cadastrar'
                 }
                 onPress={salvar}
                 icone={require('@/img/icons/save.svg')}

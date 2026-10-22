@@ -36,17 +36,17 @@ export default function ButtonSecondary({
       activeOpacity={0.8}
       style={[
         {
-          alignSelf: 'flex-start',
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 8,
+          gap: 6,
           backgroundColor: theme.cardBg,
           borderWidth: 1,
           borderColor: theme.border,
           borderRadius: 999,
-          paddingHorizontal: 32,
-          paddingVertical: 16,
+          paddingHorizontal: 12,
+          paddingVertical: 12,
+          minWidth: 0,
         },
         style,
       ]}
@@ -55,15 +55,28 @@ export default function ButtonSecondary({
         <Image
           source={icone}
           style={{
-            width: 24,
-            height: 24,
+            width: 18,
+            height: 18,
             tintColor: theme.textPrimary,
+            flexShrink: 0,
           }}
           resizeMode="contain"
         />
       )}
 
-      <Text style={[tipografia.body, { color: theme.textPrimary }]}>
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.85}
+        style={[
+          tipografia.body,
+          {
+            color: theme.textPrimary,
+            flexShrink: 1,
+            textAlign: 'center',
+          },
+        ]}
+      >
         {texto}
       </Text>
     </TouchableOpacity>
