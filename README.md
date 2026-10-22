@@ -1,6 +1,6 @@
 ## 📌 Sobre o Projeto
 
-O **Vitta** é uma plataforma multiplataforma (Web, Android e iOS) desenvolvida para apoiar famílias, cuidadores e responsáveis na organização médica de crianças e adolescentes em tratamento contínuo ou rotina preventiva.
+O **Vitta** é uma plataforma multiplataforma (Web, Android) desenvolvida para apoiar famílias, cuidadores e responsáveis na organização médica de crianças e adolescentes em tratamento contínuo ou rotina preventiva.
 
 A aplicação centraliza o controle de medicamentos prescritos, consultas clínicas, exames laboratoriais/imagem, histórico de laudos e conta com a **Vitta IA**, uma assistente inteligente integrada para esclarecer dúvidas de receitas e apoiar o cronograma familiar.
 
