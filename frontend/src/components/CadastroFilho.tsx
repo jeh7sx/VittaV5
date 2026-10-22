@@ -167,7 +167,7 @@ export default function CadastroFilho({
 							<View key={index} style={index > 0 ? styles.filhoAdicional : undefined}>
 								{filhos.length > 1 && (
 									<View style={styles.cabecalhoFilho}>
-										<Text style={styles.numeroFilho}>Filho(a) {index + 1}</Text>
+										<Text style={styles.numeroFilho}>Criança ou adolescente {index + 1}</Text>
 										{index > 0 && (
 											<TouchableOpacity onPress={() => removerFilho(index)} disabled={salvando}>
 												<Text style={styles.remover}>Remover</Text>
@@ -202,7 +202,7 @@ export default function CadastroFilho({
 							</View>
 						))}
 						<ButtonSecondary
-							texto='Adicionar outro filho'
+							texto='Adicionar outra Criança ou adolescente'
 							onPress={adicionarOutroFilho}
 
 						>
