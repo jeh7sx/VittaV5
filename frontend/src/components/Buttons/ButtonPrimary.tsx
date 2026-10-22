@@ -13,7 +13,7 @@ import { tipografia } from '@/styles/tipografia';
 import { useTheme } from '@/context/ThemeContext';
 
 interface ButtonPrimaryProps {
-  texto: string;
+  texto: any;
   onPress: () => void;
   icone?: ImageSourcePropType;
   style?: StyleProp<ViewStyle>;

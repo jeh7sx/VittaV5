@@ -49,8 +49,8 @@ const MENU_CONTA: ItemMenu[] = [
   { label: 'Crianças e adolescentes', icone: require('@/img/icons/userGroup.svg'), rota: '/filhos' },
 ];
 
-const LARGURA_ABERTA_MAX = 270;
-const LARGURA_FECHADA = 76;
+const LARGURA_ABERTA_MAX = 296;
+const LARGURA_FECHADA = 80;
 const BREAKPOINT_DESKTOP = 768;
 const STORAGE_KEY = '@vitta_user_sidebar_aberta';
 const STORAGE_POSICAO_Y = '@vitta_sidebar_btn_pos_y';
@@ -214,7 +214,7 @@ export default function Sidebar() {
   const larguraEfetiva = !isDesktop
     ? Math.min(width * 0.78, LARGURA_ABERTA_MAX)
     : aberta
-      ? Math.min(Math.max(width * 0.18, 220), LARGURA_ABERTA_MAX)
+      ? Math.min(Math.max(296), LARGURA_ABERTA_MAX)
       : LARGURA_FECHADA;
 
   const exibirTexto = !isDesktop || aberta;
@@ -229,10 +229,10 @@ export default function Sidebar() {
           width: larguraEfetiva,
           height: '100%',
           backgroundColor: theme.bg,
-          paddingVertical: 12,
-          paddingHorizontal: exibirTexto ? 12 : 8,
-          borderRightWidth: isDesktop ? 1 : 0,
-          borderColor: theme.border,
+          paddingVertical: 8,
+          paddingHorizontal: exibirTexto ? 16 : 8,
+          // borderRightWidth: isDesktop ? 1 : 0,
+          // borderColor: theme.border,
           flexDirection: 'column',
         },
         Platform.OS === 'web' && ({
@@ -286,12 +286,12 @@ export default function Sidebar() {
               onPress={toggleSidebar}
               accessibilityLabel="Alternar menu"
               style={{
-                width: 34,
-                height: 34,
-                borderRadius: 17,
+                width: 40,
+                height: 40,
+                borderRadius: 99,
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: theme.inputBg,
+                backgroundColor: theme.white,
               }}
             >
               <Image
@@ -300,7 +300,7 @@ export default function Sidebar() {
                     ? require('@/img/icons/sideBar.svg')
                     : require('@/img/icons/sideBarClosed.svg')
                 }
-                style={{ width: 18, height: 18, tintColor: theme.yellow5 }}
+                style={{ width: 24, height: 24, tintColor: theme.yellow5 }}
                 resizeMode="contain"
               />
             </TouchableOpacity>
@@ -348,7 +348,7 @@ export default function Sidebar() {
                     <ActivityIndicator size="small" color={theme.yellow5} />
                   ) : (
                     <Text
-                      style={[tipografia.body, { fontWeight: '600', fontSize: 13, color: theme.yellow5 }]}
+                      style={[tipografia.body]}
                       numberOfLines={1}
                     >
                       {filhoSelecionado?.nome ?? 'Selecionar filho'}
@@ -361,14 +361,14 @@ export default function Sidebar() {
             {exibirTexto && (
               <Image
                 source={require('@/img/icons/setaDireita.svg')}
-                style={{ width: 12, height: 12, tintColor: theme.gray4 }}
+                style={{ width: 16, height: 16, tintColor: theme.gray4 }}
                 resizeMode="contain"
               />
             )}
           </TouchableOpacity>
 
           {/* Menu Principal */}
-          <View style={{ gap: 2 }}>
+          <View >
             {MENU_PRINCIPAL.map((item) => {
               const ativo = isAtivo(item.rota);
               const hover = itemHover === item.rota;
@@ -382,10 +382,10 @@ export default function Sidebar() {
                   style={({ pressed }) => ({
                     flexDirection: 'row',
                     alignItems: 'center',
-                    gap: exibirTexto ? 12 : 0,
+                    gap: exibirTexto ? 8 : 0,
                     justifyContent: exibirTexto ? 'flex-start' : 'center',
-                    paddingVertical: 10,
-                    paddingHorizontal: exibirTexto ? 12 : 6,
+                    paddingVertical: 12,
+                    paddingHorizontal: exibirTexto ? 16 : 6,
                     borderRadius: 999,
                     backgroundColor: ativo
                       ? theme.yellow5
@@ -434,24 +434,15 @@ export default function Sidebar() {
           </View>
 
           {/* Seção Conta */}
-          <View style={{ gap: 2, marginTop: 2 }}>
-            {exibirTexto && (
+          <View style={{gap: 8}}>
+           
               <Text
                 style={[
-                  tipografia.caption,
-                  {
-                    fontSize: 11,
-                    marginBottom: 2,
-                    paddingHorizontal: 8,
-                    color: theme.gray4,
-                    textTransform: 'uppercase',
-                    letterSpacing: 0.5,
-                  },
-                ]}
+                  tipografia.caption, {color: theme.black}]}
               >
                 Conta
               </Text>
-            )}
+            
 
             {MENU_CONTA.map((item) => {
               const ativo = isAtivo(item.rota);

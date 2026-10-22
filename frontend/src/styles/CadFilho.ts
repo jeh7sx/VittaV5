@@ -1,10 +1,11 @@
 import { StyleSheet } from 'react-native';
+import { colors } from './colors';
 
 const styles = StyleSheet.create({
 	pagina: {
 		flex: 1,
 		width: '100%',
-		backgroundColor: '#FFB653',
+		backgroundColor: colors.black,
 		position: 'relative',
 		overflow: 'hidden',
 	},
@@ -35,17 +36,10 @@ const styles = StyleSheet.create({
 		width: '100%',
 		maxWidth: 540,
 		backgroundColor: '#FFF',
-		borderRadius: 22,
-		paddingHorizontal: 46,
-		paddingVertical: 38,
-		shadowColor: '#A66300',
-		shadowOffset: {
-			width: 0,
-			height: 10,
-		},
-		shadowOpacity: 0.1,
-		shadowRadius: 24,
-		elevation: 8,
+		borderRadius: 24,
+		paddingHorizontal: 48,
+		paddingVertical: 56,
+		
 	},
 
 	cardCompacto: {
@@ -92,18 +86,18 @@ const styles = StyleSheet.create({
 
 	input: {
 		borderWidth: 1,
-		borderColor: '#DEDEDE',
-		borderRadius: 10,
+		borderColor: colors.gray1,
+		borderRadius: 16,
 		paddingHorizontal: 13,
 		paddingVertical: 13,
-		fontSize: 13,
-		color: '#2F2F2F',
-		backgroundColor: '#FFF',
+		fontSize: 16,
+		color: colors.black,
+		backgroundColor:  colors.inputBg,
 	},
 
 	filhoAdicional: {
 		borderTopWidth: 1,
-		borderTopColor: '#EEEEEE',
+		borderTopColor: colors.gray1,
 		paddingTop: 18,
 		marginTop: 5,
 	},
@@ -129,13 +123,12 @@ const styles = StyleSheet.create({
 
 	botaoOutroFilho: {
 		borderWidth: 1,
-		borderColor: '#DEDEDE',
+		borderColor: colors.gray1,
 		borderRadius: 10,
 		paddingVertical: 14,
 		paddingHorizontal: 13,
-		marginTop: 2,
 		marginBottom: 30,
-		backgroundColor: '#FFF',
+		backgroundColor: colors.inputBg,
 	},
 
 	textoOutroFilho: {

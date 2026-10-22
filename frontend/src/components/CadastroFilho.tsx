@@ -13,6 +13,9 @@ import {
 	useWindowDimensions,
 	View,
 } from 'react-native';
+import { useTheme } from '@/context/ThemeContext';
+import { tipografia } from '@/styles/tipografia';
+import ButtonPrimary from './Buttons/ButtonPrimary';
 import logoVittaF from '../img/logoVittaFundo.svg';
 import { auth, db } from '../services/firebase';
 import { registrarLog } from '../utils/logs';
@@ -21,6 +24,8 @@ import { calcularIdadeNumero, dataValida, formatarData, } from '../hooks/useFilh
 import styles from '../styles/CadFilho';
 import { FilhoCadastro, CadastroFilhoProps, CampoProps, } from '../types/filhos';
 import { notificarAdmin } from '../utils/notificacaoAdmin';
+import { colors } from '@/styles/colors';
+import ButtonSecondary from './Buttons/ButtonSecondary';
 
 const FILHO_VAZIO: FilhoCadastro = {
 	nome: '',
@@ -50,6 +55,8 @@ export default function CadastroFilho({
 		),
 		[filhos],
 	);
+
+	const { theme } = useTheme();
 
 	function atualizarFilho(
 		index: number,
@@ -135,16 +142,7 @@ export default function CadastroFilho({
 
 	return (
 		<View style={styles.pagina}>
-			<View style={styles.decoracoes} pointerEvents="none">
-				<Circulo tamanho={compacto ? 72 : 116} top={compacto ? 52 : 4} right={compacto ? -20 : '19%'} opacidade={0.50} />
-				<Circulo tamanho={compacto ? 42 : 64} top="30%" left="14%" opacidade={0.42} />
-				<Circulo tamanho={compacto ? 48 : 62} top="30%" right="13%" opacidade={0.42} />
-				<Circulo tamanho={compacto ? 55 : 70} top="58%" left="5%" opacidade={0.43} />
-				<Circulo tamanho={compacto ? 48 : 68} top="56%" right="16%" opacidade={0.48} />
-				<Circulo tamanho={compacto ? 110 : 140} bottom={-34} right="5%" opacidade={0.55} />
-				<Circulo tamanho={compacto ? 85 : 135} bottom={-38} left={-32} opacidade={0.58} />
-				<Circulo tamanho={compacto ? 43 : 62} bottom="8%" left="17%" opacidade={0.38} />
-			</View>
+			
 
 			<ScrollView
 				style={{ width: '100%' }}
@@ -159,69 +157,59 @@ export default function CadastroFilho({
 				showsVerticalScrollIndicator={false}
 			>
 				<View style={[styles.card, compacto && styles.cardCompacto]}>
-					<View style={styles.marca}>
-						{Platform.OS === 'web' ? (
-							<img src={logoVittaF} alt="Vitta" style={{ width: 30, height: 30 }} />
-						) : (
-							<Image source={logoVittaF} style={{ width: 30, height: 30 }} />
-						)}
-						<Text style={styles.nomeMarca}>Vitta</Text>
-					</View>
+					<View style={{ marginBottom: 32 }}>
+						<Text style={[tipografia.h2, { marginBottom: 16 }]}>
+							Cadastre uma Criança ou adolescente
 
-					<Text style={styles.titulo}>
-						Cadastre seu{filhos.length > 1 ? 's' : ''}{'\n'}
-						<Text style={styles.tituloDestaque}>
-							filho(a){filhos.length > 1 ? 's' : ''}
 						</Text>
-					</Text>
 
-					{filhos.map((filho, index) => (
-						<View key={index} style={index > 0 ? styles.filhoAdicional : undefined}>
-							{filhos.length > 1 && (
-								<View style={styles.cabecalhoFilho}>
-									<Text style={styles.numeroFilho}>Filho(a) {index + 1}</Text>
-									{index > 0 && (
-										<TouchableOpacity onPress={() => removerFilho(index)} disabled={salvando}>
-											<Text style={styles.remover}>Remover</Text>
-										</TouchableOpacity>
-									)}
-								</View>
-							)}
+						{filhos.map((filho, index) => (
+							<View key={index} style={index > 0 ? styles.filhoAdicional : undefined}>
+								{filhos.length > 1 && (
+									<View style={styles.cabecalhoFilho}>
+										<Text style={styles.numeroFilho}>Filho(a) {index + 1}</Text>
+										{index > 0 && (
+											<TouchableOpacity onPress={() => removerFilho(index)} disabled={salvando}>
+												<Text style={styles.remover}>Remover</Text>
+											</TouchableOpacity>
+										)}
+									</View>
+								)}
 
-							<Campo
-								label="Nome"
-								placeholder="Ex: Jeferson Silva"
-								value={filho.nome}
-								onChangeText={valor => atualizarFilho(index, 'nome', valor)}
-								editable={!salvando}
-							/>
-							<Campo
-								label="Data de nascimento"
-								placeholder="Ex: 01/08/2008"
-								value={filho.dataNascimento}
-								onChangeText={valor => atualizarFilho(index, 'dataNascimento', formatarData(valor))}
-								keyboardType="numeric"
-								maxLength={10}
-								editable={!salvando}
-							/>
-							<Campo
-								label="Tipo de Neoplasia"
-								placeholder="Ex: Leucemia"
-								value={filho.tipoNeoplasia}
-								onChangeText={valor => atualizarFilho(index, 'tipoNeoplasia', valor)}
-								editable={!salvando}
-							/>
-						</View>
-					))}
+								<Campo
+									label="Nome"
+									placeholder="Ex: Jeferson Silva"
+									value={filho.nome}
+									onChangeText={valor => atualizarFilho(index, 'nome', valor)}
+									editable={!salvando}
+								/>
+								<Campo
+									label="Data de nascimento"
+									placeholder="Ex: 01/08/2008"
+									value={filho.dataNascimento}
+									onChangeText={valor => atualizarFilho(index, 'dataNascimento', formatarData(valor))}
+									keyboardType="numeric"
+									maxLength={10}
+									editable={!salvando}
+								/>
+								<Campo
+									label="Tipo de Câncer"
+									placeholder="Ex: Leucemia"
+									value={filho.tipoNeoplasia}
+									onChangeText={valor => atualizarFilho(index, 'tipoNeoplasia', valor)}
+									editable={!salvando}
+								/>
+							</View>
+						))}
+						<ButtonSecondary
+							texto='Adicionar outro filho'
+							onPress={adicionarOutroFilho}
 
-					<TouchableOpacity
-						onPress={adicionarOutroFilho}
-						disabled={salvando}
-						style={styles.botaoOutroFilho}
-					>
-						<Text style={styles.textoOutroFilho}>Adicionar outro filho</Text>
-					</TouchableOpacity>
+						>
 
+						</ButtonSecondary>
+
+					</View>
 					<View style={styles.acoes}>
 						{mostrarCancelar && (
 							<TouchableOpacity
@@ -233,25 +221,21 @@ export default function CadastroFilho({
 							</TouchableOpacity>
 						)}
 
-						<TouchableOpacity
-							onPress={cadastrarFilhos}
-							disabled={salvando}
-							style={[
-								styles.botaoAvancar,
-								mostrarCancelar ? { flex: 1 } : { width: '100%' },
-								salvando && { opacity: 0.65 },
-							]}
-						>
-							{salvando ? (
-								<ActivityIndicator size="small" color="#222" />
-							) : (
-								<View style={styles.conteudoAvancar}>
-									<Text style={styles.textoAvancar}>Avançar</Text>
-									<Text style={styles.seta}>→</Text>
-								</View>
-							)}
-						</TouchableOpacity>
 					</View>
+
+					<ButtonPrimary
+						texto={salvando ? (
+							<ActivityIndicator size="small" color="#222" />
+						) :
+							'Cadastrar'
+
+						}
+						onPress={cadastrarFilhos}
+						icone={require('@/img/icons/add-01.svg')}
+						style={{ width: '100%' }}
+					>
+
+					</ButtonPrimary>
 				</View>
 			</ScrollView>
 		</View>
@@ -264,15 +248,18 @@ function Campo({
 	...inputProps
 }: CampoProps) {
 	return (
-		<View style={{ marginBottom: 15 }}>
-			<Text style={styles.label}>{label}</Text>
+
+		<View style={{ gap: 4, marginBottom: 16 }}>
+			<Text style={tipografia.body}>{label}</Text>
 
 			<TextInput
 				{...inputProps}
-				placeholderTextColor="#9B9B9B"
+				placeholderTextColor={colors.gray4}
 				style={[styles.input, style]}
 			/>
 		</View>
+
+
 	);
 }
 

@@ -93,6 +93,7 @@ export const getStyles = (theme: ThemeColors) =>
       borderColor: theme.border,
       flex: 1,
       height: '100%',
+      width: '80%'
     },
     adesaoHeader: {
       justifyContent: 'space-between',
@@ -155,6 +156,7 @@ export const getStyles = (theme: ThemeColors) =>
       borderColor: theme.border,
       borderWidth: 1,
       borderRadius: 24,
+      width: '20%'
     },
     
     secaoProximosHeader: {
