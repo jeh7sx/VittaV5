@@ -4,23 +4,23 @@
     "slug": "vitta",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/img/logo.svg",
+    "icon": "./src/img/logo.png",
     "scheme": "vitta",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./src/img/logo.svg"
+      "icon": "./src/img/logo.png"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./src/img/logo.svg"
+        "foregroundImage": "./src/img/logo.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./src/img/logo.svg"
+      "favicon": "./src/img/logo.png"
     },
     "plugins": [
       "expo-router",
