@@ -57,7 +57,7 @@ export default function RootLayout() {
         link.rel = "icon";
         document.head.appendChild(link);
       }
-      link.href = require("@/img/logo.png");
+      link.href = require("@/img/logo.svg");
     }
   }, [segments]);
 
