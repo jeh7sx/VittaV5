@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform, } from 'react-native';
 import { ThemeColors, gerarTema } from '@/styles/themes';
 
 const defaultTheme = gerarTema('ouro', 'claro');
@@ -80,32 +80,47 @@ export const getStyles = (theme: ThemeColors) =>
 
     // Adesão / Tratamento
     secaoTratamentoLinha: {
+      flexDirection: 'row',
       justifyContent: 'space-between',
       gap: 16,
       marginBottom: 16,
+      width: '100%',
     },
+
+    // Ocupa exatamente a largura dos 2 primeiros cards + o gap do meio (aprox. 66.6% - metade do gap)
     cardAdesao: {
       backgroundColor: theme.cardBg,
       borderRadius: 24,
       padding: 24,
       borderWidth: 1,
-      gap: 16,
       borderColor: theme.border,
-      flex: 1,
-      height: '100%',
-      width: '80%'
+      gap: 16,
+      width: (Platform.OS === 'web' ? 'calc(66.66% - 8px)' : '65%') as any,
+      minWidth: 0,
+      justifyContent: 'space-between', // Mantém o header colado ao topo e o corpo preenchendo o espaço
+    },
+
+    secaoProximos: {
+      gap: 12,
+      backgroundColor: theme.cardBg,
+      padding: 24,
+      borderColor: theme.border,
+      borderWidth: 1,
+      borderRadius: 24,
+      width: (Platform.OS === 'web' ? 'calc(33.33% - 8px)' : '33%') as any,
+      minWidth: 0,
     },
     adesaoHeader: {
       justifyContent: 'space-between',
       gap: 16,
     },
-  adesaoSegmented: {
+    adesaoSegmented: {
       flexDirection: 'row',
       backgroundColor: theme.inputBg,
       borderRadius: 999,
       padding: 4,
       gap: 4,
-      alignSelf: 'flex-start', // <- A barra terá apenas a largura dos botões
+      alignSelf: 'flex-start', // A barra terá apenas a largura dos botões
     },
     adesaoBtn: {
       paddingVertical: 8,
@@ -122,9 +137,13 @@ export const getStyles = (theme: ThemeColors) =>
       fontWeight: '700',
     },
     adesaoCorpo: {
-      alignItems: 'center',
-      gap: 36,
-      paddingVertical: 8,
+      flex: 1,                  // Ocupa todo o espaço vertical disponível abaixo do header
+      flexDirection: 'row',     // Deixa o gráfico e os status lado a lado
+      alignItems: 'center',     // Centraliza verticalmente o gráfico e os dados
+      justifyContent: 'center', // Centraliza no meio do card
+      gap: 32,
+      paddingVertical: 12,
+      width: '100%',
     },
     adesaoGraficoCentroTexto: {
       fontSize: 28,
@@ -137,28 +156,20 @@ export const getStyles = (theme: ThemeColors) =>
       color: theme.textSecondary,
       marginTop: -2,
     },
-   cardStatus: {
+    cardStatus: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
       backgroundColor: theme.cardBg,
-      borderRadius: 16, 
+      borderRadius: 16,
       paddingVertical: 14,
       paddingHorizontal: 16,
       borderWidth: 1,
       borderColor: theme.border,
       width: '100%',
     },
-    secaoProximos: {
-      gap: 12,
-      backgroundColor: theme.cardBg,
-      padding: 24,
-      borderColor: theme.border,
-      borderWidth: 1,
-      borderRadius: 24,
-      width: '20%'
-    },
-    
+
+
     secaoProximosHeader: {
       flexDirection: 'row',
       alignItems: 'center',

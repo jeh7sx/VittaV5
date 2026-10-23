@@ -1,7 +1,6 @@
+// styles/calendario.ts (ou o caminho correto do seu ficheiro)
 import { StyleSheet } from 'react-native';
-import { ThemeColors, gerarTema } from '@/styles/themes';
-
-const defaultTheme = gerarTema('ouro', 'claro');
+import { ThemeColors } from '@/styles/themes';
 
 export const getStyles = (theme: ThemeColors) =>
   StyleSheet.create({
@@ -302,5 +301,3 @@ export const getStyles = (theme: ThemeColors) =>
       backgroundColor: theme.yellow1,
     },
   });
-
-export const styles = getStyles(defaultTheme);

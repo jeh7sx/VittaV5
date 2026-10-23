@@ -4,7 +4,6 @@ import { useFocusEffect } from 'expo-router';
 import {
   EmailAuthProvider,
   reauthenticateWithCredential,
-  updateEmail,
   verifyBeforeUpdateEmail,
   updatePassword,
 } from 'firebase/auth';
@@ -22,12 +21,14 @@ import { notificarAdmin } from '../utils/notificacaoAdmin';
 
 export interface DadosPerfil {
   nome: string;
+  cpf: string;
   dataNascimento: string;
   email: string;
 }
 
 const PERFIL_VAZIO: DadosPerfil = {
   nome: '',
+  cpf: '',
   dataNascimento: '',
   email: '',
 };
@@ -44,6 +45,21 @@ export function formatarData(valor: string) {
   }
 
   return `${numeros.slice(0, 2)}/${numeros.slice(2, 4)}/${numeros.slice(4)}`;
+}
+
+export function formatarCpf(valor: string) {
+  const numeros = valor.replace(/\D/g, '').slice(0, 11);
+
+  if (numeros.length <= 3) {
+    return numeros;
+  }
+  if (numeros.length <= 6) {
+    return `${numeros.slice(0, 3)}.${numeros.slice(3)}`;
+  }
+  if (numeros.length <= 9) {
+    return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6)}`;
+  }
+  return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6, 9)}-${numeros.slice(9)}`;
 }
 
 function obterMensagemErro(erro: unknown) {
@@ -71,6 +87,7 @@ export function usePerfil() {
   const [dadosSalvos, setDadosSalvos] = useState<DadosPerfil | null>(null);
 
   const [nome, setNome] = useState('');
+  const [cpf, setCpf] = useState('');
   const [dataNascimento, setDataNascimento] = useState('');
   const [email, setEmail] = useState('');
   const [foto, setFoto] = useState('');
@@ -97,6 +114,7 @@ export function usePerfil() {
     if (!usuario) {
       setDadosSalvos(null);
       setNome('');
+      setCpf('');
       setDataNascimento('');
       setEmail('');
       setFoto('');
@@ -125,6 +143,7 @@ export function usePerfil() {
 
         perfil = {
           nome: dados.nome ?? '',
+          cpf: dados.cpf ?? '',
           dataNascimento: dados.dataNascimento ?? '',
           email: dados.email ?? usuario.email ?? '',
         };
@@ -132,6 +151,7 @@ export function usePerfil() {
 
       setDadosSalvos(perfil);
       setNome(perfil.nome);
+      setCpf(formatarCpf(perfil.cpf));
       setDataNascimento(perfil.dataNascimento);
       setEmail(perfil.email);
 
@@ -182,6 +202,7 @@ export function usePerfil() {
   const cancelar = useCallback(() => {
     if (dadosSalvos) {
       setNome(dadosSalvos.nome);
+      setCpf(formatarCpf(dadosSalvos.cpf));
       setDataNascimento(dadosSalvos.dataNascimento);
       setEmail(dadosSalvos.email);
     }
@@ -210,8 +231,16 @@ export function usePerfil() {
       return 'Informe a data de nascimento no formato DD/MM/AAAA.';
     }
 
+    const emailAtual = auth.currentUser?.email?.toLowerCase() ?? '';
+    const emailFoiAlterado = email.trim().toLowerCase() !== emailAtual;
+
+    if (emailFoiAlterado && !senhaAtual) {
+      setMostrarSenha(true);
+      return 'Por segurança, informe sua senha atual para alterar o e-mail.';
+    }
+
     const desejaAlterarSenha =
-      mostrarSenha && Boolean(senhaAtual || senhaNova || senhaConfirm);
+      mostrarSenha && Boolean(senhaNova || senhaConfirm);
 
     if (desejaAlterarSenha) {
       if (!senhaAtual) {
@@ -249,6 +278,7 @@ export function usePerfil() {
     }
 
     const nomeTratado = nome.trim();
+    const cpfLimpo = cpf.replace(/\D/g, '');
     const emailTratado = email.trim().toLowerCase();
     const emailAtual = usuario.email?.toLowerCase() ?? '';
 
@@ -259,36 +289,28 @@ export function usePerfil() {
     try {
       setSalvando(true);
 
-      // Reautentica se houver senha atual informada para alteração segura
-      if (senhaAtual && usuario.email) {
+      if ((emailFoiAlterado || senhaAtual) && senhaAtual && usuario.email) {
         const credencial = EmailAuthProvider.credential(usuario.email, senhaAtual);
         await reauthenticateWithCredential(usuario, credencial);
       }
 
-      // Atualiza e-mail no Authentication
+      // Dispara a alteração de e-mail segura nativa do Firebase (envia o link de verificação)
       if (emailFoiAlterado) {
         try {
-          await updateEmail(usuario, emailTratado);
+          await verifyBeforeUpdateEmail(usuario, emailTratado);
         } catch (eAuth: any) {
-          // Se exigir verificação prévia conforme SDKs novos
-          if (verifyBeforeUpdateEmail) {
-            await verifyBeforeUpdateEmail(usuario, emailTratado);
-            Alert.alert(
-              'Confirmação enviada',
-              'Um link de verificação foi enviado para o novo e-mail para confirmar a alteração.',
-            );
-          } else {
-            throw eAuth;
+          if (eAuth?.code === 'auth/requires-recent-login') {
+            setMostrarSenha(true);
+            throw new Error('Por segurança, digite sua senha atual para alterar o e-mail.');
           }
+          throw eAuth;
         }
       }
 
-      // Atualiza senha no Authentication se preenchida
       if (senhaFoiPreenchida) {
         await updatePassword(usuario, senhaNova);
       }
 
-      // Atualiza Firestore no documento do usuário
       await setDoc(
         doc(db, 'usuarios', usuario.uid),
         {
@@ -300,14 +322,27 @@ export function usePerfil() {
         { merge: true },
       );
 
+      if (cpfLimpo.length === 11) {
+        await setDoc(
+          doc(db, 'cpfs', cpfLimpo),
+          {
+            uid: usuario.uid,
+            email: emailTratado,
+            atualizadoEm: serverTimestamp(),
+          },
+          { merge: true },
+        );
+      }
+
       await notificarAdmin({
         titulo: 'Perfil Atualizado',
         descricao: `${nomeTratado} concluiu a atualização dos dados de perfil.`,
         tipo: 'perfil',
       });
-      
+
       const novosDadosSalvos: DadosPerfil = {
         nome: nomeTratado,
+        cpf,
         dataNascimento,
         email: emailTratado,
       };
@@ -317,7 +352,14 @@ export function usePerfil() {
       setDadosSalvos(novosDadosSalvos);
       limparCamposSenha();
 
-      Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
+      if (emailFoiAlterado) {
+        Alert.alert(
+          'Confirmação enviada',
+          'Enviamos um link de confirmação para o seu novo e-mail. Verifique sua caixa de entrada para concluir a alteração.'
+        );
+      } else {
+        Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
+      }
     } catch (erro) {
       const codigo = obterCodigoErro(erro);
       console.error('Erro ao salvar perfil:', erro);
@@ -327,14 +369,16 @@ export function usePerfil() {
         codigo === 'auth/invalid-credential' ||
         codigo === 'auth/invalid-login-credentials'
       ) {
-        Alert.alert('Erro', 'Senha atual incorreta.');
+        setMostrarSenha(true);
+        Alert.alert('Erro', 'Senha atual incorreta. Insira sua senha para prosseguir.');
         return;
       }
 
       if (codigo === 'auth/requires-recent-login') {
+        setMostrarSenha(true);
         Alert.alert(
-          'Erro',
-          'Por segurança, informe sua senha atual para alterar o e-mail ou a senha.',
+          'Atenção',
+          'Por segurança, informe sua senha atual no campo "Segurança da conta" para alterar o e-mail.',
         );
         return;
       }
@@ -360,6 +404,7 @@ export function usePerfil() {
     }
   }, [
     nome,
+    cpf,
     dataNascimento,
     email,
     mostrarSenha,
@@ -438,6 +483,7 @@ export function usePerfil() {
     dadosSalvos,
     nome,
     setNome,
+    cpf,
     dataNascimento,
     setDataNascimento,
     alterarDataNascimento,

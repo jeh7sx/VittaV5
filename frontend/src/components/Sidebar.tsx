@@ -348,7 +348,10 @@ export default function Sidebar() {
                     <ActivityIndicator size="small" color={theme.yellow5} />
                   ) : (
                     <Text
-                      style={[tipografia.body]}
+                      style={[
+                        tipografia.body,
+                        { color: theme.yellow5 }
+                      ]}
                       numberOfLines={1}
                     >
                       {filhoSelecionado?.nome ?? 'Selecionar filho'}
@@ -434,15 +437,15 @@ export default function Sidebar() {
           </View>
 
           {/* Seção Conta */}
-          <View style={{gap: 8}}>
-           
-              <Text
-                style={[
-                  tipografia.caption, {color: theme.black}]}
-              >
-                Conta
-              </Text>
-            
+          <View style={{ gap: 8 }}>
+
+            <Text
+              style={[
+                tipografia.caption, { color: theme.black }]}
+            >
+              Conta
+            </Text>
+
 
             {MENU_CONTA.map((item) => {
               const ativo = isAtivo(item.rota);

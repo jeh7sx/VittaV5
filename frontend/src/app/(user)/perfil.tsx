@@ -8,10 +8,10 @@ import {
   TouchableOpacity,
   View,
   useWindowDimensions,
-  type KeyboardTypeOptions,
 } from 'react-native';
 
 import { usePerfil } from '../../hooks/usePerfil';
+import { useAuth } from '../../hooks/useAuth';
 import { styles } from '../../styles/app/(user)/perfil';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -28,11 +28,13 @@ export default function Perfil() {
   const isNarrow = width < 768;
 
   const { theme } = useTheme();
+  const { recuperarSenha } = useAuth();
 
   const {
     dadosSalvos,
     nome,
     setNome,
+    cpf,
     dataNascimento,
     alterarDataNascimento,
     email,
@@ -58,6 +60,12 @@ export default function Perfil() {
 
   const senhasDiferentes =
     senhaConfirm.length > 0 && senhaNova !== senhaConfirm;
+
+  const handleEsqueciSenha = () => {
+    if (dadosSalvos?.email) {
+      void recuperarSenha(dadosSalvos.email);
+    }
+  };
 
   return (
     <View style={[styles.pagina, { flex: 1, backgroundColor: theme.bg }]}>
@@ -188,6 +196,15 @@ export default function Perfil() {
                   theme={theme}
                 />
 
+                {/* CPF Bloqueado para edição */}
+                <FormField
+                  label="CPF (Não pode ser alterado)"
+                  placeholder="000.000.000-00"
+                  value={cpf}
+                  editable={false}
+                  theme={theme}
+                />
+
                 <FormField
                   label="Data de nascimento"
                   placeholder="DD/MM/AAAA"
@@ -199,17 +216,23 @@ export default function Perfil() {
                   theme={theme}
                 />
 
-                <FormField
-                  label="E-mail"
-                  placeholder="seu@email.com"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  editable={!salvando}
-                  theme={theme}
-                />
+                {/* Campo de Alteração de E-mail */}
+                <View style={{ gap: 4 }}>
+                  <FormField
+                    label="E-mail"
+                    placeholder="seu@email.com"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    editable={!salvando}
+                    theme={theme}
+                  />
+                  <Text style={[tipografia.caption, { color: theme.textSecondary, fontSize: 11, marginTop: 2 }]}>
+                    Ao alterar o e-mail, um link de verificação será enviado pelo Firebase para confirmar a troca.
+                  </Text>
+                </View>
 
                 {/* Seção de Senha */}
                 <View
@@ -253,6 +276,12 @@ export default function Perfil() {
                         editable={!salvando}
                         theme={theme}
                       />
+
+                      <TouchableOpacity onPress={handleEsqueciSenha} style={{ alignSelf: 'flex-start' }}>
+                        <Text style={[tipografia.caption, { color: '#F7B500', fontWeight: '600' }]}>
+                          Não lembra da senha atual? Enviar link de redefinição por e-mail
+                        </Text>
+                      </TouchableOpacity>
 
                       <PasswordField
                         label="Nova senha"

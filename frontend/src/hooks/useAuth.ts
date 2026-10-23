@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   deleteUser,
   User,
   signOut,
@@ -15,6 +16,7 @@ import {
   where,
   doc,
   getDoc,
+  setDoc,
   serverTimestamp,
   writeBatch,
   updateDoc,
@@ -31,6 +33,30 @@ function exibirAlerta(titulo: string, mensagem: string) {
     window.alert(`${titulo}: ${mensagem}`);
   } else {
     Alert.alert(titulo, mensagem);
+  }
+}
+
+// Função para enviar o e-mail de redefinição de senha nativo do Firebase
+export async function recuperarSenha(emailRecuperacao: string) {
+  const emailLimpo = emailRecuperacao.trim().toLowerCase();
+  
+  if (!emailLimpo) {
+    exibirAlerta('Atenção', 'Informe o seu e-mail cadastrado para recuperar a senha.');
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, emailLimpo);
+    exibirAlerta(
+      'E-mail enviado', 
+      'Enviamos um link de redefinição de senha para o seu e-mail. Verifique sua caixa de entrada e spam.'
+    );
+  } catch (error: any) {
+    if (error?.code === 'auth/user-not-found') {
+      exibirAlerta('Erro', 'Não existe conta cadastrada com este e-mail.');
+    } else {
+      exibirAlerta('Erro', 'Não foi possível enviar o e-mail de recuperação. Tente novamente.');
+    }
   }
 }
 
@@ -69,7 +95,7 @@ async function processarConvitesPendentes(uid: string, email: string, nomeUsuari
       });
     }
   } catch (e) {
-    console.error('Erro ao processar convites vinculados:', e);
+    console.warn('Erro ao processar convites vinculados:', e);
   }
 }
 
@@ -157,23 +183,28 @@ export function useAuth() {
           return;
         }
 
-        const consultaCPF = query(
-          collection(db, 'usuarios'),
-          where('cpf', '==', cpfLimpo),
-        );
+        const cpfDocRef = doc(db, 'cpfs', cpfLimpo);
+        const cpfSnap = await getDoc(cpfDocRef);
 
-        const resultado = await getDocs(consultaCPF);
-
-        if (resultado.empty) {
+        if (!cpfSnap.exists()) {
           exibirAlerta('Erro', 'CPF não encontrado.');
           return;
         }
 
-        const dadosUsuario = resultado.docs[0].data();
-        const emailEncontrado = dadosUsuario.email;
+        const dadosCpf = cpfSnap.data();
+        let emailEncontrado = dadosCpf?.email;
+
+        if (!emailEncontrado && dadosCpf?.uid) {
+          try {
+            const usuarioSnap = await getDoc(doc(db, 'usuarios', dadosCpf.uid));
+            if (usuarioSnap.exists()) {
+              emailEncontrado = usuarioSnap.data().email;
+            }
+          } catch (e) {}
+        }
 
         if (typeof emailEncontrado !== 'string' || !emailEncontrado.trim()) {
-          exibirAlerta('Erro', 'O usuário não possui um email válido cadastrado.');
+          exibirAlerta('Aviso', 'Por favor, faça login utilizando o seu e-mail cadastrado nesta primeira vez.');
           return;
         }
 
@@ -188,7 +219,27 @@ export function useAuth() {
 
       const uid = credencial.user.uid;
 
-      // 1. Checa status no painel Admin
+      try {
+        const usuarioRef = doc(db, 'usuarios', uid);
+        const usuarioSnap = await getDoc(usuarioRef);
+        if (usuarioSnap.exists()) {
+          const cpfDoUsuario = usuarioSnap.data()?.cpf;
+          if (cpfDoUsuario) {
+            const cpfDocRef = doc(db, 'cpfs', cpfDoUsuario);
+            const cpfSnap = await getDoc(cpfDocRef);
+            if (!cpfSnap.exists() || !cpfSnap.data()?.email) {
+              await setDoc(
+                cpfDocRef,
+                { uid, email: emailLocal, atualizadoEm: serverTimestamp() },
+                { merge: true }
+              );
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Erro ao atualizar mapeamento do CPF no login:', e);
+      }
+
       try {
         const adminRef = doc(db, 'admins', uid);
         const adminSnap = await getDoc(adminRef);
@@ -211,10 +262,9 @@ export function useAuth() {
           return;
         }
       } catch (e) {
-        console.error('Erro ao verificar permissão do admin:', e);
+        console.warn('Erro ao verificar permissão do admin:', e);
       }
 
-      // 2. Checa status de Usuário Comum
       try {
         const usuarioRef = doc(db, 'usuarios', uid);
         const usuarioSnap = await getDoc(usuarioRef);
@@ -228,11 +278,10 @@ export function useAuth() {
             return;
           }
 
-          // Processa convites recebidos por esse e-mail
           await processarConvitesPendentes(uid, emailLocal, dados.nome || 'Usuário');
         }
       } catch (e) {
-        console.error('Erro ao verificar status do usuário:', e);
+        console.warn('Erro ao verificar status do usuário:', e);
       }
 
       try {
@@ -240,8 +289,18 @@ export function useAuth() {
       } catch (erroLog) { }
 
       router.replace('/visaoGeral');
-    } catch (erro: unknown) {
-      console.error('Erro ao realizar login:', erro);
+    } catch (erro: any) {
+      const codigo = erro?.code || '';
+      if (
+        codigo === 'auth/invalid-credential' ||
+        codigo === 'auth/wrong-password' ||
+        codigo === 'auth/user-not-found'
+      ) {
+        console.warn('Tentativa de login com credenciais inválidas.');
+      } else {
+        console.warn('Erro ao realizar login:', erro?.message || erro);
+      }
+
       exibirAlerta('Erro', 'Email/CPF ou senha inválidos.');
     } finally {
       setCarregando(false);
@@ -294,12 +353,12 @@ export function useAuth() {
 
       batch.set(doc(db, 'cpfs', cpfLimpo), {
         uid,
+        email: emailFormatado,
         criadoEm: serverTimestamp(),
       });
 
       await batch.commit();
 
-      // Processa convites pendentes recebidos previamente para este email
       await processarConvitesPendentes(uid, emailFormatado, nomeFormatado);
 
       try {
@@ -315,11 +374,16 @@ export function useAuth() {
         ]);
       }
     } catch (erro: any) {
-      console.error('Erro no cadastro:', erro);
       if (erro?.code === 'auth/email-already-in-use') {
         setErros((prev) => ({ ...prev, email: 'Este email já está cadastrado.' }));
+        if (usuarioCriadoNoAuth) {
+          await deleteUser(usuarioCriadoNoAuth).catch(() => { });
+        }
         return;
       }
+
+      console.warn('Aviso no cadastro:', erro?.message || erro);
+
       if (usuarioCriadoNoAuth) {
         await deleteUser(usuarioCriadoNoAuth).catch(() => { });
       }
@@ -338,6 +402,7 @@ export function useAuth() {
     setMostrarSenha,
     alternarVisibilidadeSenha,
     signIn,
+    recuperarSenha,
 
     nome,
     setNome,

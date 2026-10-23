@@ -40,11 +40,14 @@ export interface ThemeColors {
 	bgCalendario: string;
 	Filhos: string;
 	bgFilhos: string;
+
+	delete: string;
+
 }
 
 export const PALETAS_INFO: { id: PaletaId; nome: string; cor: string }[] = [
-	{ id: 'vermelho', nome: 'Vermelho Rubi', cor: '#E11D48' },
 	{ id: 'ouro', nome: 'Vitta Ouro', cor: '#F59E0B' },
+	{ id: 'vermelho', nome: 'Vermelho Rubi', cor: '#E11D48' },
 	{ id: 'lavanda', nome: 'Lavanda', cor: '#8B5CF6' },
 	{ id: 'menta', nome: 'Menta & Esmeralda', cor: '#10B981' },
 	{ id: 'oceano', nome: 'Oceano Azul', cor: '#2563EB' },
@@ -68,6 +71,7 @@ export function gerarTema(paleta: PaletaId, modo: ModoTema): ThemeColors {
 			gray4: '#A0A0A0',
 			gray3: '#757575',
 			gray1: '#2C2C2C',
+			delete: '#C31F1F',
 		}
 		: {
 			bg: '#F4F4F4',
@@ -82,6 +86,7 @@ export function gerarTema(paleta: PaletaId, modo: ModoTema): ThemeColors {
 			gray4: '#777777',
 			gray3: '#9E9E9E',
 			gray1: '#EDEDED',
+			delete: '#C31F1F',
 		};
 
 	switch (paleta) {

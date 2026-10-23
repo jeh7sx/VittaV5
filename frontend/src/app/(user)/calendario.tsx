@@ -23,7 +23,7 @@ import {
   obterConfigTipo,
   obterStatusVisual,
 } from '@/controllers/useCalendarioController';
-import { styles } from '../../styles/app/(user)/calendario';
+import { getStyles } from '../../styles/app/(user)/calendario';
 
 export default function Calendario() {
   const { width } = useWindowDimensions();
@@ -31,6 +31,7 @@ export default function Calendario() {
   const isDesktopLargo = width >= 1024;
 
   const { theme } = useTheme();
+  const styles = getStyles(theme);
 
   const {
     mesAtual,

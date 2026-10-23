@@ -227,12 +227,13 @@ export default function Medicamentos() {
     medicamentosFiltrados,
     fecharMenus,
     handleAbrirEditarCustom,
+    handleConfirmarAcoesEmMassa,
     handleConfirmarAlteracaoDose,
     aplicarDataSelecionada,
     navegarParaMedicamentos,
   } = useMedicamentosController();
 
-  const isNarrow = isNarrowScreen || hookIsNarrow;
+  const isNarrow = isNarrowScreen;
 
   return (
     <TouchableOpacity activeOpacity={1} onPress={fecharMenus} style={[styles.pagina, { backgroundColor: theme.bg }]}>
@@ -619,6 +620,10 @@ export default function Medicamentos() {
           if (!podeEditarFilhoSelecionado) return;
           setDoseSelecionada({ dose, medicamento: med, jaTomou });
         }}
+        onAplicarAcaoEmMassa={(med: any, doses: Date[], marcar: boolean) => {
+          if (!podeEditarFilhoSelecionado) return;
+          handleConfirmarAcoesEmMassa(med, doses, marcar);
+        }}
       />
 
       {/* Modal Ação de Dose */}
@@ -769,49 +774,70 @@ function CardMedicamentoItem({
         )}
       </View>
 
-      {/* Menu de 3 Pontinhos */}
-      <View style={{ position: 'relative', flexShrink: 0 }}>
-        <TouchableOpacity
-          accessibilityLabel="Mais opções"
-          activeOpacity={0.7}
-          onPress={onToggleMenuOpcoes}
-          style={styles.btnMaisOpcoes}
-        >
-          <Text style={{ fontSize: 20, lineHeight: 20, fontWeight: 'bold', color: theme.textSecondary }}>⋮</Text>
-        </TouchableOpacity>
+      {/* ECRÃ GRANDE: Mostra os ícones soltos lado a lado */}
+      {!isNarrow ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, flexShrink: 0, paddingHorizontal: 4 }}>
+          <TouchableOpacity onPress={onVerMais} activeOpacity={0.7} accessibilityLabel="Ver mais">
+            <Image source={require('@/img/icons/view.svg')} style={{ width: 20, height: 20, tintColor: theme.textPrimary }} resizeMode="contain" />
+          </TouchableOpacity>
 
-        {menuOpcoesAberto && (
-          <View style={[styles.menuOpcoesDropdown, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-            <TouchableOpacity
-              onPress={onVerMais}
-              style={[styles.itemMenuOpcoes, { borderBottomWidth: 1, borderBottomColor: theme.border }]}
-            >
-              <Image source={require('@/img/icons/view.svg')} style={{ width: 18, height: 18, tintColor: theme.textPrimary }} />
-              <Text style={{ color: theme.textPrimary, fontSize: 14, fontWeight: '500' }}>Ver mais</Text>
-            </TouchableOpacity>
+          {podeEditar && (
+            <>
+              <TouchableOpacity onPress={onEditar} activeOpacity={0.7} accessibilityLabel="Editar">
+                <Image source={require('@/img/icons/edit-02.svg')} style={{ width: 20, height: 20, tintColor: theme.textPrimary }} resizeMode="contain" />
+              </TouchableOpacity>
 
-            {podeEditar && (
-              <>
-                <TouchableOpacity
-                  onPress={onEditar}
-                  style={[styles.itemMenuOpcoes, { borderBottomWidth: 1, borderBottomColor: theme.border }]}
-                >
-                  <Image source={require('@/img/icons/edit-02.svg')} style={{ width: 18, height: 18, tintColor: theme.textPrimary }} />
-                  <Text style={{ color: theme.textPrimary, fontSize: 14, fontWeight: '500' }}>Editar</Text>
-                </TouchableOpacity>
+              <TouchableOpacity onPress={onExcluir} activeOpacity={0.7} accessibilityLabel="Excluir">
+                <Image source={require('@/img/icons/delete-02.svg')} style={{ width: 20, height: 20, tintColor: '#E11919' }} resizeMode="contain" />
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      ) : (
+        /* ECRÃ PEQUENO: Mostra o menu de 3 pontinhos */
+        <View style={{ position: 'relative', flexShrink: 0 }}>
+          <TouchableOpacity
+            accessibilityLabel="Mais opções"
+            activeOpacity={0.7}
+            onPress={onToggleMenuOpcoes}
+            style={styles.btnMaisOpcoes}
+          >
+            <Text style={{ fontSize: 20, lineHeight: 20, fontWeight: 'bold', color: theme.textSecondary }}>⋮</Text>
+          </TouchableOpacity>
 
-                <TouchableOpacity
-                  onPress={onExcluir}
-                  style={styles.itemMenuOpcoes}
-                >
-                  <Image source={require('@/img/icons/delete-02.svg')} style={{ width: 18, height: 18, tintColor: '#E11919' }} />
-                  <Text style={{ color: '#E11919', fontSize: 14, fontWeight: '500' }}>Excluir</Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        )}
-      </View>
+          {menuOpcoesAberto && (
+            <View style={[styles.menuOpcoesDropdown, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+              <TouchableOpacity
+                onPress={onVerMais}
+                style={[styles.itemMenuOpcoes, { borderBottomWidth: 1, borderBottomColor: theme.border }]}
+              >
+                <Image source={require('@/img/icons/view.svg')} style={{ width: 18, height: 18, tintColor: theme.textPrimary }} />
+                <Text style={{ color: theme.textPrimary, fontSize: 14, fontWeight: '500' }}>Ver mais</Text>
+              </TouchableOpacity>
+
+              {podeEditar && (
+                <>
+                  <TouchableOpacity
+                    onPress={onEditar}
+                    style={[styles.itemMenuOpcoes, { borderBottomWidth: 1, borderBottomColor: theme.border }]}
+                  >
+                    <Image source={require('@/img/icons/edit-02.svg')} style={{ width: 18, height: 18, tintColor: theme.textPrimary }} />
+                    <Text style={{ color: theme.textPrimary, fontSize: 14, fontWeight: '500' }}>Editar</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={onExcluir}
+                    style={styles.itemMenuOpcoes}
+                  >
+                    <Image source={require('@/img/icons/delete-02.svg')} style={{ width: 18, height: 18, tintColor: '#E11919' }} />
+                    <Text style={{ color: '#E11919', fontSize: 14, fontWeight: '500' }}>Excluir</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          )}
+        </View>
+      )}
     </View>
   );
 }
@@ -1097,11 +1123,34 @@ function ModalVerMaisMed({
   onFechar,
   onVisualizarFoto,
   onSelecionarDose,
+  onAplicarAcaoEmMassa,
 }: any) {
   if (!modalVerMais) return null;
 
   const medAtual = medicamentos.find((m: Medicamento) => m.id === modalVerMais.id) || modalVerMais;
   const todasAsDoses = calcularTodasAsDoses(medAtual);
+
+  const [dosesSelecionadas, setDosesSelecionadas] = useState<number[]>([]);
+  const [progressoScroll, setProgressoScroll] = useState(0);
+  const [larguraContainer, setLarguraContainer] = useState(1);
+  const [larguraConteudo, setLarguraConteudo] = useState(1);
+
+  const alternarSelecaoDose = (timestamp: number) => {
+    setDosesSelecionadas((prev) =>
+      prev.includes(timestamp)
+        ? prev.filter((t) => t !== timestamp)
+        : [...prev, timestamp]
+    );
+  };
+
+  const selecionarTodas = () => {
+    const todosTimestamps = todasAsDoses.map((d) => d.getTime());
+    if (dosesSelecionadas.length === todosTimestamps.length) {
+      setDosesSelecionadas([]);
+    } else {
+      setDosesSelecionadas(todosTimestamps);
+    }
+  };
 
   return (
     <Modal animationType="fade" transparent visible={Boolean(modalVerMais)} onRequestClose={onFechar}>
@@ -1179,49 +1228,224 @@ function ModalVerMaisMed({
               {/* Doses programadas */}
               {todasAsDoses.length > 0 && (
                 <View style={{ marginTop: 8 }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  {/* LINHA 1: Título na esquerda */}
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: 6,
+                    }}
+                  >
                     <Text style={[tipografia.caption, { color: theme.textSecondary }]}>
                       Horários Programados ({todasAsDoses.length} doses)
                     </Text>
-                    <View style={{ flexDirection: 'row', gap: 6 }}>
-                      <TouchableOpacity
-                        onPress={() => scrollDosesRef.current?.scrollTo({ x: 0, animated: true })}
-                        style={{ padding: 6, backgroundColor: theme.inputBg, borderRadius: 999 }}
-                      >
-                        <Image source={require('@/img/icons/setaEsquerda.svg')} style={{ tintColor: theme.textPrimary }} />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => scrollDosesRef.current?.scrollToEnd({ animated: true })}
-                        style={{ padding: 6, backgroundColor: theme.inputBg, borderRadius: 999 }}
-                      >
-                        <Image source={require('@/img/icons/setaDireita.svg')} style={{ tintColor: theme.textPrimary }} />
-                      </TouchableOpacity>
-                    </View>
                   </View>
 
-                  <ScrollView ref={scrollDosesRef} horizontal showsHorizontalScrollIndicator contentContainerStyle={{ gap: 8, paddingVertical: 4 }}>
+                  {/* LINHA 2: Botões de ação no canto direito */}
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'flex-end',
+                      alignItems: 'center',
+                      gap: 6,
+                      marginBottom: 8,
+                    }}
+                  >
+                    {dosesSelecionadas.length > 0 && (
+                      <>
+                        <TouchableOpacity
+                          activeOpacity={0.7}
+                          onPress={() => {
+                            if (typeof onAplicarAcaoEmMassa === 'function') {
+                              onAplicarAcaoEmMassa(medAtual, dosesSelecionadas, true);
+                            }
+                            setDosesSelecionadas([]);
+                          }}
+                          style={{
+                            backgroundColor: '#DCFCE7',
+                            paddingHorizontal: 10,
+                            paddingVertical: 6,
+                            borderRadius: 8,
+                            borderWidth: 1,
+                            borderColor: '#86EFAC',
+                          }}
+                        >
+                          <Text style={{ fontSize: 11, fontWeight: '700', color: '#15803D' }}>
+                            Marcar tomadas ({dosesSelecionadas.length})
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          activeOpacity={0.7}
+                          onPress={() => {
+                            if (typeof onAplicarAcaoEmMassa === 'function') {
+                              onAplicarAcaoEmMassa(medAtual, dosesSelecionadas, false);
+                            }
+                            setDosesSelecionadas([]);
+                          }}
+                          style={{
+                            backgroundColor: '#FEE2E2',
+                            paddingHorizontal: 10,
+                            paddingVertical: 6,
+                            borderRadius: 8,
+                            borderWidth: 1,
+                            borderColor: '#FCA5A5',
+                          }}
+                        >
+                          <Text style={{ fontSize: 11, fontWeight: '700', color: '#B91C1C' }}>
+                            Desmarcar ({dosesSelecionadas.length})
+                          </Text>
+                        </TouchableOpacity>
+                      </>
+                    )}
+
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={selecionarTodas}
+                      style={{
+                        backgroundColor: dosesSelecionadas.length === todasAsDoses.length ? theme.yellow5 : theme.inputBg,
+                        paddingHorizontal: 10,
+                        paddingVertical: 6,
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        borderColor: theme.yellow5,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 11,
+                          fontWeight: '700',
+                          color: dosesSelecionadas.length === todasAsDoses.length ? theme.yellow9 : theme.yellow6,
+                        }}
+                      >
+                        {dosesSelecionadas.length === todasAsDoses.length ? 'Desmarcar todas' : 'Selecionar todas'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* SCROLLVIEW DAS DOSES */}
+                  <ScrollView
+                    ref={scrollDosesRef}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ gap: 8, paddingVertical: 4 }}
+                    onScroll={(e) => {
+                      const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+                      const maxScroll = contentSize.width - layoutMeasurement.width;
+                      if (maxScroll > 0) {
+                        const progresso = contentOffset.x / maxScroll;
+                        setProgressoScroll(Math.max(0, Math.min(1, progresso)));
+                      }
+                    }}
+                    onContentSizeChange={(w) => setLarguraConteudo(w)}
+                    onLayout={(e) => setLarguraContainer(e.nativeEvent.layout.width)}
+                    scrollEventThrottle={16}
+                  >
                     {todasAsDoses.map((dose: Date, idx: number) => {
+                      const timestamp = dose.getTime();
                       const dia = String(dose.getDate()).padStart(2, '0');
                       const mes = String(dose.getMonth() + 1).padStart(2, '0');
                       const hora = String(dose.getHours()).padStart(2, '0');
                       const min = String(dose.getMinutes()).padStart(2, '0');
-                      const jaTomou = (medAtual.dosesTomadas || []).includes(dose.getTime());
+                      const jaTomou = (medAtual.dosesTomadas || []).includes(timestamp);
+                      const selecionadaVisualmente = dosesSelecionadas.includes(timestamp);
+
                       const estilo = obterEstiloDose(dose, medAtual.dosesTomadas || [], medAtual.status);
 
                       return (
                         <TouchableOpacity
                           key={idx}
                           activeOpacity={0.7}
-                          onPress={() => onSelecionarDose(dose, medAtual, jaTomou)}
-                          style={[styles.doseCardItem, { backgroundColor: estilo.bg, borderColor: estilo.borda }]}
+                          onPress={() => alternarSelecaoDose(timestamp)}
+                          onLongPress={() => onSelecionarDose(dose, medAtual, jaTomou)}
+                          style={[
+                            styles.doseCardItem,
+                            {
+                              backgroundColor: selecionadaVisualmente ? theme.yellow1 : estilo.bg,
+                              borderColor: selecionadaVisualmente ? theme.yellow5 : estilo.borda,
+                              borderWidth: selecionadaVisualmente ? 2 : 1.5,
+                            },
+                          ]}
                         >
-                          <Text style={{ fontSize: 11, color: estilo.texto, fontWeight: '600' }}>{dia}/{mes}</Text>
-                          <Text style={{ fontSize: 13, fontWeight: '800', color: estilo.texto, marginTop: 2 }}>{hora}:{min}</Text>
-                          <Text style={{ fontSize: 9, fontWeight: '700', color: estilo.texto, marginTop: 3 }}>{estilo.label}</Text>
+                          <Text style={{ fontSize: 11, color: selecionadaVisualmente ? theme.yellow9 : estilo.texto, fontWeight: '600' }}>{dia}/{mes}</Text>
+                          <Text style={{ fontSize: 13, fontWeight: '800', color: selecionadaVisualmente ? theme.yellow9 : estilo.texto, marginTop: 2 }}>{hora}:{min}</Text>
+                          <Text style={{ fontSize: 9, fontWeight: '700', color: selecionadaVisualmente ? theme.yellow9 : estilo.texto, marginTop: 3 }}>
+                            {selecionadaVisualmente ? 'Selecionado' : estilo.label}
+                          </Text>
                         </TouchableOpacity>
                       );
                     })}
                   </ScrollView>
+
+                  {/* BARRA DE ROLAGEM DINÂMICA COM SETAS NAS EXTREMIDADES */}
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 8,
+                      marginTop: 8,
+                      paddingHorizontal: 2,
+                    }}
+                  >
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => scrollDosesRef.current?.scrollTo({ x: 0, animated: true })}
+                      style={{
+                        padding: 6,
+                        backgroundColor: theme.inputBg,
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        borderColor: theme.border,
+                      }}
+                    >
+                      <Image
+                        source={require('@/img/icons/setaEsquerda.svg')}
+                        style={{ width: 14, height: 14, tintColor: theme.textPrimary }}
+                      />
+                    </TouchableOpacity>
+
+                    <View
+                      style={{
+                        flex: 1,
+                        height: 6,
+                        backgroundColor: theme.inputBg,
+                        borderRadius: 999,
+                        borderWidth: 1,
+                        borderColor: theme.border,
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: `${Math.max(15, (larguraContainer / larguraConteudo) * 100)}%`,
+                          height: '100%',
+                          backgroundColor: theme.yellow5,
+                          borderRadius: 999,
+                          transform: [{
+                            translateX: progressoScroll * (larguraContainer * 0.6)
+                          }]
+                        }}
+                      />
+                    </View>
+
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => scrollDosesRef.current?.scrollToEnd({ animated: true })}
+                      style={{
+                        padding: 6,
+                        backgroundColor: theme.inputBg,
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        borderColor: theme.border,
+                      }}
+                    >
+                      <Image
+                        source={require('@/img/icons/setaDireita.svg')}
+                        style={{ width: 14, height: 14, tintColor: theme.textPrimary }}
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               )}
 

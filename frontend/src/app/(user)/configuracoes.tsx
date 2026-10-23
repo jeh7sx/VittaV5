@@ -18,6 +18,7 @@ import { deleteUser } from 'firebase/auth';
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   deleteDoc,
   query,
@@ -97,6 +98,10 @@ export default function Configuracoes() {
   const [carregandoSessoes, setCarregandoSessoes] = useState(false);
   const [processandoId, setProcessandoId] = useState<string | null>(null);
 
+  // Modal de Confirmação de Exclusão de Conta
+  const [modalExclusaoVisivel, setModalExclusaoVisivel] = useState(false);
+  const [eliminandoConta, setEliminandoConta] = useState(false);
+
   useEffect(() => {
     async function carregarConfigs() {
       try {
@@ -147,7 +152,6 @@ export default function Configuracoes() {
     await AsyncStorage.setItem(STORAGE_LEMBRETES_KEY, valorStr);
   };
 
-  // Carregar sessões ativas do utilizador
   const carregarSessoes = useCallback(async () => {
     const usuario = auth.currentUser;
     if (!usuario) return;
@@ -168,7 +172,7 @@ export default function Configuracoes() {
       try {
         const snap = await getDocs(collection(db, 'usuarios', usuario.uid, 'sessoes'));
         setSessoes(snap.docs.map((d) => ({ id: d.id, ...d.data() } as SessaoItem)));
-      } catch {}
+      } catch { }
     } finally {
       setCarregandoSessoes(false);
     }
@@ -179,7 +183,6 @@ export default function Configuracoes() {
     carregarSessoes();
   }
 
-  // Encerrar uma sessão específica
   const encerrarSessaoIndividual = async (sessao: SessaoItem) => {
     const usuario = auth.currentUser;
     if (!usuario) return;
@@ -196,7 +199,6 @@ export default function Configuracoes() {
     }
   };
 
-  // Encerrar todas as outras sessões (mantém apenas este dispositivo)
   const encerrarTodasAsOutrasSessoes = async () => {
     const usuario = auth.currentUser;
     if (!usuario) return;
@@ -218,7 +220,6 @@ export default function Configuracoes() {
     }
   };
 
-  // Exportação de Relatório
   function exportarRelatorio() {
     if (!filhoSelecionado) {
       Alert.alert('Atenção', 'Selecione um dependente para exportar os seus dados.');
@@ -261,7 +262,6 @@ export default function Configuracoes() {
     }
   }
 
-  // Limpeza de cache local
   async function limparCacheLocal() {
     try {
       const keys = await AsyncStorage.getAllKeys();
@@ -277,35 +277,54 @@ export default function Configuracoes() {
     }
   }
 
-  // Eliminação de Conta
-  async function confirmarExclusaoConta() {
+  // ---- EXECUÇÃO DEFINITIVA DA EXCLUSÃO DA CONTA ----
+  async function executarExclusaoConta() {
     const usuario = auth.currentUser;
-    if (!usuario) return;
+    if (!usuario) {
+      setModalExclusaoVisivel(false);
+      return;
+    }
 
-    const mensagem = 'Tem a certeza de que deseja eliminar permanentemente a sua conta? Esta ação é irreversível.';
-    const executar = async () => {
-      try {
-        await deleteUser(usuario);
-        sair();
-      } catch (err: any) {
-        if (err.code === 'auth/requires-recent-login') {
-          Alert.alert(
-            'Reautenticação necessária',
-            'Por questões de segurança, termine a sessão e entre novamente antes de apagar a conta.'
-          );
-        } else {
-          Alert.alert('Erro', err.message || 'Não foi possível apagar a conta.');
+    try {
+      setEliminandoConta(true);
+
+      // 1. Busca CPF para apagar o registo correspondente na coleção 'cpfs'
+      const usuarioRef = doc(db, 'usuarios', usuario.uid);
+      const usuarioSnap = await getDoc(usuarioRef);
+
+      if (usuarioSnap.exists()) {
+        const cpfDoUsuario = usuarioSnap.data()?.cpf;
+        if (cpfDoUsuario) {
+          const cpfLimpo = cpfDoUsuario.replace(/\D/g, '');
+          await deleteDoc(doc(db, 'cpfs', cpfLimpo)).catch(() => { });
         }
       }
-    };
 
-    if (Platform.OS === 'web') {
-      if (window.confirm(mensagem)) executar();
-    } else {
-      Alert.alert('Eliminar Conta', mensagem, [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Eliminar Definitivamente', style: 'destructive', onPress: executar },
-      ]);
+      // 2. Apaga documentos do Firestore
+      await deleteDoc(usuarioRef).catch(() => { });
+      await deleteDoc(doc(db, 'fotos', usuario.uid)).catch(() => { });
+
+      // 3. Exclui o utilizador no Firebase Auth
+      await deleteUser(usuario);
+
+      // 4. Limpa credenciais locais e redireciona
+      setModalExclusaoVisivel(false);
+      await sair();
+    } catch (err: any) {
+      console.warn('Erro ao eliminar conta:', err);
+
+      setModalExclusaoVisivel(false);
+
+      if (err?.code === 'auth/requires-recent-login') {
+        Alert.alert(
+          'Reautenticação necessária',
+          'Por segurança, encerre a sessão e volte a entrar com a sua senha antes de apagar a conta.'
+        );
+      } else {
+        Alert.alert('Erro', 'Não foi possível eliminar a conta. Tente novamente.');
+      }
+    } finally {
+      setEliminandoConta(false);
     }
   }
 
@@ -332,7 +351,6 @@ export default function Configuracoes() {
         <View style={cardEstilo(theme)}>
           <Text style={[tipografia.h3, { color: theme.textPrimary }]}>Aparência e Temas</Text>
 
-          {/* Modo Claro / Escuro */}
           <View style={{ gap: 10 }}>
             <Text style={[tipografia.caption, { color: theme.textSecondary, textTransform: 'uppercase' }]}>
               Modo de Exibição
@@ -397,7 +415,6 @@ export default function Configuracoes() {
             </View>
           </View>
 
-          {/* Paleta de Cores */}
           <View style={{ gap: 10 }}>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
               {paletasDisponiveis.map((item) => {
@@ -439,7 +456,6 @@ export default function Configuracoes() {
         <View style={cardEstilo(theme)}>
           <Text style={[tipografia.h3, { color: theme.textPrimary }]}>Lembretes e Avisos</Text>
 
-          {/* Medicamentos */}
           <View style={linhaSwitch}>
             <View style={{ flex: 1, paddingRight: 16, minWidth: 0 }}>
               <Text style={[tipografia.body, { color: theme.textPrimary, fontWeight: '600' }]}>
@@ -459,7 +475,6 @@ export default function Configuracoes() {
 
           <View style={divisor(theme)} />
 
-          {/* Consultas */}
           <View style={linhaSwitch}>
             <View style={{ flex: 1, paddingRight: 16, minWidth: 0 }}>
               <Text style={[tipografia.body, { color: theme.textPrimary, fontWeight: '600' }]}>
@@ -479,7 +494,6 @@ export default function Configuracoes() {
 
           <View style={divisor(theme)} />
 
-          {/* Exames */}
           <View style={linhaSwitch}>
             <View style={{ flex: 1, paddingRight: 16, minWidth: 0 }}>
               <Text style={[tipografia.body, { color: theme.textPrimary, fontWeight: '600' }]}>
@@ -560,7 +574,6 @@ export default function Configuracoes() {
         <View style={cardEstilo(theme)}>
           <Text style={[tipografia.h3, { color: theme.textPrimary }]}>Segurança e Acesso</Text>
 
-          {/* Gerir Sessões e Dispositivos */}
           <View
             style={{
               flexDirection: isMobile ? 'column' : 'row',
@@ -586,7 +599,6 @@ export default function Configuracoes() {
 
           <View style={divisor(theme)} />
 
-          {/* Envio de e-mail de redefinição de senha */}
           <View
             style={{
               flexDirection: isMobile ? 'column' : 'row',
@@ -616,7 +628,6 @@ export default function Configuracoes() {
 
           <View style={divisor(theme)} />
 
-          {/* Alterar Senha Diretamente */}
           <View style={{ gap: 12 }}>
             <TouchableOpacity
               onPress={alternarCamposSenha}
@@ -680,7 +691,6 @@ export default function Configuracoes() {
 
           <View style={divisor(theme)} />
 
-          {/* Limpeza de Cache Local */}
           <View
             style={{
               flexDirection: isMobile ? 'column' : 'row',
@@ -710,6 +720,10 @@ export default function Configuracoes() {
           <Text style={[tipografia.h3, { color: theme.textPrimary }]}>Ajuda e Termos</Text>
 
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+            <ButtonSecondary
+              texto="Recursos da Plataforma"
+              onPress={() => router.push('/(user)/recursos' as any)}
+            />
             <ButtonSecondary texto="Perguntas Frequentes (FAQ)" onPress={() => router.push('/(user)/faq' as any)} />
             <ButtonSecondary texto="Termos de Uso" onPress={() => router.push('/(user)/termos' as any)} />
             <ButtonSecondary texto="Privacidade" onPress={() => router.push('/(user)/privacidade' as any)} />
@@ -725,7 +739,6 @@ export default function Configuracoes() {
         <View style={[cardEstilo(theme), { borderColor: isDark ? '#7F1D1D' : '#FCA5A5' }]}>
           <Text style={[tipografia.h3, { color: isDark ? '#FCA5A5' : '#DC2626' }]}>Zona de Perigo</Text>
 
-          {/* Terminar Sessão */}
           <View
             style={{
               flexDirection: isMobile ? 'column' : 'row',
@@ -770,16 +783,14 @@ export default function Configuracoes() {
             </View>
             <ButtonDelete
               texto="Eliminar Conta"
-              onPress={confirmarExclusaoConta}
+              onPress={() => setModalExclusaoVisivel(true)}
               style={isMobile ? { width: '100%' } : undefined}
             />
           </View>
         </View>
       </ScrollView>
 
-      {/* ========================================================
-          MODAL DE SESSÕES ATIVAS & DISPOSITIVOS CONECTADOS
-      ======================================================== */}
+      {/* MODAL DE SESSÕES ATIVAS */}
       <Modal
         animationType="fade"
         transparent
@@ -908,7 +919,6 @@ export default function Configuracoes() {
               </ScrollView>
             )}
 
-            {/* Botão de Encerrar Todas as Outras */}
             {sessoes.length > 1 && (
               <View style={{ marginTop: 6, width: '100%' }}>
                 <ButtonDelete
@@ -924,6 +934,72 @@ export default function Configuracoes() {
             )}
           </View>
         </TouchableOpacity>
+      </Modal>
+
+      {/* MODAL DE CONFIRMAÇÃO PARA ELIMINAR CONTA */}
+      <Modal
+        animationType="fade"
+        transparent
+        visible={modalExclusaoVisivel}
+        onRequestClose={() => {
+          if (!eliminandoConta) setModalExclusaoVisivel(false);
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+          }}
+        >
+          <View
+            style={{
+              width: '100%',
+              maxWidth: 420,
+              backgroundColor: theme.cardBg,
+              borderRadius: 24,
+              padding: 24,
+              borderWidth: 1,
+              borderColor: theme.border,
+              gap: 16,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={[tipografia.h3, { color: theme.textPrimary, textAlign: 'center' }]}>
+              Confirmação
+            </Text>
+
+            <Text style={[tipografia.bodySecondary, { color: theme.textSecondary, textAlign: 'center' }]}>
+              Tem a certeza de que deseja eliminar permanentemente a sua conta? Esta ação é irreversível.
+            </Text>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                gap: 12,
+                marginTop: 8,
+                width: '100%',
+                justifyContent: 'center',
+              }}
+            >
+              <ButtonSecondary
+                texto="Cancelar"
+                onPress={() => setModalExclusaoVisivel(false)}
+                disabled={eliminandoConta}
+                style={{ flex: 1 }}
+              />
+
+              <ButtonDelete
+                texto={eliminandoConta ? 'A eliminar...' : 'Confirmar'}
+                onPress={() => void executarExclusaoConta()}
+                // disabled={eliminandoConta}
+                style={{ flex: 1 }}
+              />
+            </View>
+          </View>
+        </View>
       </Modal>
     </View>
   );

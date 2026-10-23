@@ -80,6 +80,52 @@ export function useMedicamentosController() {
     }
   }
 
+  async function handleConfirmarAcoesEmMassa(
+  medAtual: Medicamento,
+  timestampsSelecionados: number[],
+  marcarComoTomadas: boolean
+) {
+  if (!medAtual || timestampsSelecionados.length === 0) return;
+  setSalvandoDose(true);
+
+  try {
+    const tomadasAtuais = medAtual.dosesTomadas || [];
+    let novasDoses: number[];
+
+    if (marcarComoTomadas) {
+      // Adiciona os timestamps selecionados ao array atual (evitando duplicados)
+      novasDoses = Array.from(new Set([...tomadasAtuais, ...timestampsSelecionados]));
+    } else {
+      // Remove apenas os timestamps selecionados mantendo os outros
+      novasDoses = tomadasAtuais.filter((t) => !timestampsSelecionados.includes(t));
+    }
+
+    const novoStatus = calcularStatusDinamico({
+      ...medAtual,
+      dosesTomadas: novasDoses,
+    });
+
+    const medRef = doc(db, 'medicamentos', medAtual.id);
+    await updateDoc(medRef, {
+      dosesTomadas: novasDoses,
+      status: novoStatus,
+      atualizadoEm: serverTimestamp(),
+    });
+
+    medData.setModalVerMais((prev: any) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        dosesTomadas: novasDoses,
+        status: novoStatus,
+      };
+    });
+  } catch (err) {
+    console.error('Erro ao atualizar doses selecionadas:', err);
+  } finally {
+    setSalvandoDose(false);
+  }
+}
   async function handleConfirmarAlteracaoDose() {
     if (!doseSelecionada) return;
     setSalvandoDose(true);
@@ -171,6 +217,7 @@ export function useMedicamentosController() {
     medicamentosFiltrados,
     fecharMenus,
     handleAbrirEditarCustom,
+    handleConfirmarAcoesEmMassa,
     handleConfirmarAlteracaoDose,
     aplicarDataSelecionada,
     navegarParaMedicamentos,
