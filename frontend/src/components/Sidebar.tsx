@@ -42,6 +42,7 @@ const MENU_PRINCIPAL: ItemMenu[] = [
   { label: 'Exames', icone: require('@/img/icons/microscope.svg'), rota: '/exames' },
   { label: 'Calendário', icone: require('@/img/icons/calendar-02.svg'), rota: '/calendario' },
   { label: 'Documentos', icone: require('@/img/icons/document.svg'), rota: '/documentos' },
+  { label: 'Mapa', icone: require('@/img/icons/maps.svg'), rota: '/mapaSaude' },
 ];
 
 const MENU_CONTA: ItemMenu[] = [

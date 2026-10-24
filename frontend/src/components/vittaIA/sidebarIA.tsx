@@ -122,17 +122,17 @@ export default function SidebarIA({
           style={[
             styles.botaoFlutuante,
             {
-              backgroundColor:
-                theme.id === 'dark'
-                  ? 'rgba(30, 30, 30, 0.88)'
-                  : 'rgba(255, 255, 255, 0.92)',
+              // backgroundColor:
+              //   theme.id === 'dark'
+              //     ? 'rgba(30, 30, 30, 0.88)'
+              //     : 'rgba(255, 255, 255, 0.92)',
               borderColor: theme.yellow5,
             },
           ]}
         >
           <Image
             source={require('@/img/icons/sideBarClosed.svg')}
-            style={{ width: 20, height: 20, tintColor: theme.yellow6 || theme.textPrimary }}
+            style={{ width: 20, height: 20, tintColor: theme.yellow5}}
             resizeMode="contain"
           />
         </TouchableOpacity>
@@ -174,14 +174,14 @@ export default function SidebarIA({
               style={[
                 styles.botaoToggle,
                 {
-                  backgroundColor: theme.inputBg,
+                  backgroundColor: theme.inputBg,                 
                 },
               ]}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
               <Image
                 source={require('@/img/icons/sideBar.svg')}
-                style={{ width: 18, height: 18, tintColor: theme.textSecondary }}
+                style={{ width: 18, height: 18,  tintColor: theme.yellow5, }}
                 resizeMode="contain"
               />
             </TouchableOpacity>
