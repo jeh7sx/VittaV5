@@ -100,8 +100,8 @@ export default function ButtonPrimary({
             gap: 6,
             backgroundColor: theme.yellow5,
             borderRadius: 999,
-            paddingHorizontal: 12,
-            paddingVertical: 12,
+            paddingHorizontal: 32,
+            paddingVertical: 16,
             opacity: disabled ? 0.7 : 1,
           },
           Platform.OS === 'web' && ({
@@ -113,8 +113,8 @@ export default function ButtonPrimary({
           <Image
             source={icone}
             style={{
-              width: 18,
-              height: 18,
+              width: 24,
+              height: 24,
               tintColor: corTextoIcone,
               flexShrink: 0,
             }}

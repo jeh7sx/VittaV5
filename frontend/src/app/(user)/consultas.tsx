@@ -598,6 +598,7 @@ function CardConsultaItem({
 }) {
   const turno = item.turno || calcularTurnoConsulta(item.horario);
   const corTurno = turno === 'Manhã' ? '#E8A300' : turno === 'Tarde' ? '#F07C00' : '#252A63';
+  const [hoverAcao, setHoverAcao] = useState<string | null>(null);
 
   return (
     <View
@@ -650,12 +651,12 @@ function CardConsultaItem({
       )}
 
       <View style={{ flex: 1, minWidth: 0 }}>
-        <Text style={[tipografia.body, { color: theme.textPrimary, fontSize: isNarrow ? 13 : 15, fontWeight: '600' }]}>
+        <Text style={[tipografia.body, { color: theme.textPrimary, fontSize: isNarrow ? 14 : 16, fontWeight: '600' }]}>
           {item.horario ? `${item.horario} horas` : '—'}
         </Text>
         {!isNarrow && item.horario ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 }}>
-            <Image source={ICONE_TURNO[turno]} style={{ width: 20, height: 20, tintColor: corTurno }} resizeMode="contain" />
+            <Image source={ICONE_TURNO[turno]} style={{ width: 24, height: 24, tintColor: corTurno }} resizeMode="contain" />
             <Text style={[tipografia.body, { color: corTurno }]}>{turno}</Text>
           </View>
         ) : null}
@@ -703,7 +704,7 @@ function CardConsultaItem({
               >
                 <Image
                   source={ICONE_STATUS[status]}
-                  style={{ width: 20, height: 20, tintColor: COR_STATUS[status].text }}
+                  style={{ width: 24, height: 24, tintColor: COR_STATUS[status].text }}
                   resizeMode="contain"
                 />
                 <Text
@@ -725,18 +726,65 @@ function CardConsultaItem({
 
       {/* Ações */}
       {!isNarrow ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginLeft: 2, flexShrink: 0 }}>
-          <TouchableOpacity accessibilityLabel="Visualizar consulta" activeOpacity={0.65} onPress={onVerMais} style={{ width: 30, height: 40, alignItems: 'center', justifyContent: 'center' }}>
-            <Image source={require('@/img/icons/view.svg')} style={{ width: 24, height: 24, tintColor: theme.textPrimary }} />
-          </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 0, position: 'relative' }}>
+          {/* Botão Ver mais */}
+          <View style={{ position: 'relative', alignItems: 'center' }}>
+            <TouchableOpacity
+              onPress={onVerMais}
+              activeOpacity={0.65}
+              // @ts-ignore
+              onMouseEnter={() => setHoverAcao('ver')}
+              onMouseLeave={() => setHoverAcao(null)}
+              style={{ padding: 6 }}
+            >
+              <Image source={require('@/img/icons/view.svg')} style={{ width: 24, height: 24, tintColor: theme.textPrimary }} />
+            </TouchableOpacity>
+            {hoverAcao === 'ver' && (
+              <View style={{ position: 'absolute', bottom: '100%', marginBottom: 4, backgroundColor: '#1E293B', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, zIndex: 9999 }}>
+                <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '600' }}>Ver mais</Text>
+              </View>
+            )}
+          </View>
+
           {podeEditar && (
             <>
-              <TouchableOpacity accessibilityLabel="Editar consulta" activeOpacity={0.65} onPress={onEditar} style={{ width: 30, height: 40, alignItems: 'center', justifyContent: 'center' }}>
-                <Image source={require('@/img/icons/edit-02.svg')} style={{ width: 24, height: 24, tintColor: theme.textPrimary }} resizeMode="contain" />
-              </TouchableOpacity>
-              <TouchableOpacity accessibilityLabel="Excluir consulta" activeOpacity={0.65} onPress={onExcluir} style={{ width: 30, height: 40, alignItems: 'center', justifyContent: 'center' }}>
-                <Image source={require('@/img/icons/delete-02.svg')} style={{ width: 24, height: 24, tintColor: '#E11919' }} resizeMode="contain" />
-              </TouchableOpacity>
+              {/* Botão Editar */}
+              <View style={{ position: 'relative', alignItems: 'center' }}>
+                <TouchableOpacity
+                  onPress={onEditar}
+                  activeOpacity={0.65}
+                  // @ts-ignore
+                  onMouseEnter={() => setHoverAcao('edit')}
+                  onMouseLeave={() => setHoverAcao(null)}
+                  style={{ padding: 6 }}
+                >
+                  <Image source={require('@/img/icons/edit-02.svg')} style={{ width: 24, height: 24, tintColor: theme.textPrimary }} resizeMode="contain" />
+                </TouchableOpacity>
+                {hoverAcao === 'edit' && (
+                  <View style={{ position: 'absolute', bottom: '100%', marginBottom: 4, backgroundColor: '#1E293B', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, zIndex: 9999 }}>
+                    <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '600' }}>Editar</Text>
+                  </View>
+                )}
+              </View>
+
+              {/* Botão Excluir */}
+              <View style={{ position: 'relative', alignItems: 'center' }}>
+                <TouchableOpacity
+                  onPress={onExcluir}
+                  activeOpacity={0.65}
+                  // @ts-ignore
+                  onMouseEnter={() => setHoverAcao('del')}
+                  onMouseLeave={() => setHoverAcao(null)}
+                  style={{ padding: 6 }}
+                >
+                  <Image source={require('@/img/icons/delete-02.svg')} style={{ width: 24, height: 24, tintColor: '#E11919' }} resizeMode="contain" />
+                </TouchableOpacity>
+                {hoverAcao === 'del' && (
+                  <View style={{ position: 'absolute', bottom: '100%', marginBottom: 4, backgroundColor: '#1E293B', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, zIndex: 9999 }}>
+                    <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '600' }}>Excluir</Text>
+                  </View>
+                )}
+              </View>
             </>
           )}
         </View>
@@ -829,7 +877,7 @@ function FormConsulta(props: any) {
         style={[styles.input, { minHeight: 70, textAlignVertical: 'top', marginBottom: 14, backgroundColor: theme.inputBg, borderColor: theme.border, color: theme.textPrimary }]}
       />
 
-      <View style={{ flexDirection: isNarrow ? 'column' : 'row', gap: 12, marginBottom: 14 }}>
+      <View style={{ flexDirection: isNarrow ? 'column' : 'row', gap: 16, marginBottom: 14 }}>
         <View style={{ flex: 1 }}>
           <Text style={[styles.label, { color: theme.textPrimary }]}>Data</Text>
           <TouchableOpacity
@@ -837,10 +885,10 @@ function FormConsulta(props: any) {
             onPress={onAbrirCalendario}
             style={[styles.input, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: theme.inputBg, borderColor: theme.border }]}
           >
-            <Text style={{ color: dataConsulta ? theme.textPrimary : '#AAA', fontSize: 15 }}>
+            <Text style={{ color: dataConsulta ? theme.textPrimary : '#AAA', fontSize: 16 }}>
               {dataConsulta || 'Selecionar data'}
             </Text>
-            <Image source={require('@/img/icons/calendar-02.svg')} style={{ width: 20, height: 20, tintColor: theme.gray4 }} />
+            <Image source={require('@/img/icons/calendar-02.svg')} style={{ width: 24, height: 24, tintColor: theme.gray4 }} />
           </TouchableOpacity>
         </View>
 
@@ -980,13 +1028,13 @@ function ModalVerMaisConsulta({
                   },
                 ]}
               >
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <Image
                     source={ICONE_STATUS[consulta.status]}
                     style={{ width: 24, height: 24, tintColor: COR_STATUS[consulta.status].text }}
                     resizeMode="contain"
                   />
-                  <Text style={[tipografia.body, { color: COR_STATUS[consulta.status].text, fontWeight: '700' }]}>
+                  <Text style={[tipografia.body, { color: COR_STATUS[consulta.status].text, }]}>
                     {consulta.status}
                   </Text>
                 </View>
@@ -997,7 +1045,7 @@ function ModalVerMaisConsulta({
 
             {/* Linhas de Informações */}
             <View style={{ gap: 12, marginBottom: 16 }}>
-              {consulta.dataConsulta && <InfoRow icon="📅" label="Data" value={consulta.dataConsulta} theme={theme} />}
+              {consulta.dataConsulta && <InfoRow icon={require('@/img/icons/alarm-clock.svg')} label="Data" value={consulta.dataConsulta} theme={theme} />}
               {consulta.horario && (
                 <InfoRow
                   icon={ICONE_TURNO[consulta.turno] || '🕐'}

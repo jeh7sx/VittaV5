@@ -695,7 +695,8 @@ function CardMedicamentoItem({
 }) {
   const proximoInfo = obterProximoHorario(item);
   const displayHorario = proximoInfo ? proximoInfo.dataFormatada : `${item.horario} horas`;
-
+  const [hoverAcao, setHoverAcao] = useState<string | null>(null);
+  
   return (
     <View
       style={[
@@ -776,20 +777,65 @@ function CardMedicamentoItem({
 
       {/* ECRÃ GRANDE: Mostra os ícones soltos lado a lado */}
       {!isNarrow ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, flexShrink: 0, paddingHorizontal: 4 }}>
-          <TouchableOpacity onPress={onVerMais} activeOpacity={0.7} accessibilityLabel="Ver mais">
-            <Image source={require('@/img/icons/view.svg')} style={{ width: 20, height: 20, tintColor: theme.textPrimary }} resizeMode="contain" />
-          </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 0, position: 'relative' }}>
+          {/* Botão Ver mais */}
+          <View style={{ position: 'relative', alignItems: 'center' }}>
+            <TouchableOpacity
+              onPress={onVerMais}
+              activeOpacity={0.65}
+              // @ts-ignore
+              onMouseEnter={() => setHoverAcao('ver')}
+              onMouseLeave={() => setHoverAcao(null)}
+              style={{ padding: 6 }}
+            >
+              <Image source={require('@/img/icons/view.svg')} style={{ width: 24, height: 24, tintColor: theme.textPrimary }} />
+            </TouchableOpacity>
+            {hoverAcao === 'ver' && (
+              <View style={{ position: 'absolute', bottom: '100%', marginBottom: 4, backgroundColor: '#1E293B', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, zIndex: 9999 }}>
+                <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '600' }}>Ver mais</Text>
+              </View>
+            )}
+          </View>
 
           {podeEditar && (
             <>
-              <TouchableOpacity onPress={onEditar} activeOpacity={0.7} accessibilityLabel="Editar">
-                <Image source={require('@/img/icons/edit-02.svg')} style={{ width: 20, height: 20, tintColor: theme.textPrimary }} resizeMode="contain" />
-              </TouchableOpacity>
+              {/* Botão Editar */}
+              <View style={{ position: 'relative', alignItems: 'center' }}>
+                <TouchableOpacity
+                  onPress={onEditar}
+                  activeOpacity={0.65}
+                  // @ts-ignore
+                  onMouseEnter={() => setHoverAcao('edit')}
+                  onMouseLeave={() => setHoverAcao(null)}
+                  style={{ padding: 6 }}
+                >
+                  <Image source={require('@/img/icons/edit-02.svg')} style={{ width: 24, height: 24, tintColor: theme.textPrimary }} resizeMode="contain" />
+                </TouchableOpacity>
+                {hoverAcao === 'edit' && (
+                  <View style={{ position: 'absolute', bottom: '100%', marginBottom: 4, backgroundColor: '#1E293B', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, zIndex: 9999 }}>
+                    <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '600' }}>Editar</Text>
+                  </View>
+                )}
+              </View>
 
-              <TouchableOpacity onPress={onExcluir} activeOpacity={0.7} accessibilityLabel="Excluir">
-                <Image source={require('@/img/icons/delete-02.svg')} style={{ width: 20, height: 20, tintColor: '#E11919' }} resizeMode="contain" />
-              </TouchableOpacity>
+              {/* Botão Excluir */}
+              <View style={{ position: 'relative', alignItems: 'center' }}>
+                <TouchableOpacity
+                  onPress={onExcluir}
+                  activeOpacity={0.65}
+                  // @ts-ignore
+                  onMouseEnter={() => setHoverAcao('del')}
+                  onMouseLeave={() => setHoverAcao(null)}
+                  style={{ padding: 6 }}
+                >
+                  <Image source={require('@/img/icons/delete-02.svg')} style={{ width: 24, height: 24, tintColor: '#E11919' }} resizeMode="contain" />
+                </TouchableOpacity>
+                {hoverAcao === 'del' && (
+                  <View style={{ position: 'absolute', bottom: '100%', marginBottom: 4, backgroundColor: '#1E293B', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, zIndex: 9999 }}>
+                    <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '600' }}>Excluir</Text>
+                  </View>
+                )}
+              </View>
             </>
           )}
         </View>
@@ -1248,7 +1294,7 @@ function ModalVerMaisMed({
                       flexDirection: 'row',
                       justifyContent: 'flex-end',
                       alignItems: 'center',
-                      gap: 6,
+                      gap: 8,
                       marginBottom: 8,
                     }}
                   >
@@ -1263,15 +1309,15 @@ function ModalVerMaisMed({
                             setDosesSelecionadas([]);
                           }}
                           style={{
-                            backgroundColor: '#DCFCE7',
-                            paddingHorizontal: 10,
-                            paddingVertical: 6,
-                            borderRadius: 8,
-                            borderWidth: 1,
-                            borderColor: '#86EFAC',
+                            // backgroundColor: '#DCFCE7',
+                            paddingHorizontal: 16,
+                            paddingVertical: 8,
+                            borderRadius: 899,
+                            // borderWidth: 1,
+                            // borderColor: '#86EFAC',
                           }}
                         >
-                          <Text style={{ fontSize: 11, fontWeight: '700', color: '#15803D' }}>
+                          <Text style={tipografia.caption}>
                             Marcar tomadas ({dosesSelecionadas.length})
                           </Text>
                         </TouchableOpacity>
@@ -1285,15 +1331,15 @@ function ModalVerMaisMed({
                             setDosesSelecionadas([]);
                           }}
                           style={{
-                            backgroundColor: '#FEE2E2',
-                            paddingHorizontal: 10,
-                            paddingVertical: 6,
+                            // backgroundColor: '#FEE2E2',
+                            paddingHorizontal: 16,
+                            paddingVertical: 8,
                             borderRadius: 8,
-                            borderWidth: 1,
-                            borderColor: '#FCA5A5',
+                            // borderWidth: 1,
+                            // borderColor: '#FCA5A5',
                           }}
                         >
-                          <Text style={{ fontSize: 11, fontWeight: '700', color: '#B91C1C' }}>
+                          <Text style={tipografia.caption}>
                             Desmarcar ({dosesSelecionadas.length})
                           </Text>
                         </TouchableOpacity>
@@ -1305,19 +1351,17 @@ function ModalVerMaisMed({
                       onPress={selecionarTodas}
                       style={{
                         backgroundColor: dosesSelecionadas.length === todasAsDoses.length ? theme.yellow5 : theme.inputBg,
-                        paddingHorizontal: 10,
-                        paddingVertical: 6,
-                        borderRadius: 8,
-                        borderWidth: 1,
-                        borderColor: theme.yellow5,
+                        paddingHorizontal: 16,
+                        paddingVertical: 8,
+                        borderRadius: 899,
+                        // borderWidth: 1,
+                        // borderColor: theme.yellow5,
                       }}
                     >
                       <Text
-                        style={{
-                          fontSize: 11,
-                          fontWeight: '700',
-                          color: dosesSelecionadas.length === todasAsDoses.length ? theme.yellow9 : theme.yellow6,
-                        }}
+                        style={[tipografia.caption, {
+                          color: dosesSelecionadas.length === todasAsDoses.length ? theme.yellow9 : theme.gray4,
+                        }]}
                       >
                         {dosesSelecionadas.length === todasAsDoses.length ? 'Desmarcar todas' : 'Selecionar todas'}
                       </Text>
@@ -1363,14 +1407,14 @@ function ModalVerMaisMed({
                             styles.doseCardItem,
                             {
                               backgroundColor: selecionadaVisualmente ? theme.yellow1 : estilo.bg,
-                              borderColor: selecionadaVisualmente ? theme.yellow5 : estilo.borda,
-                              borderWidth: selecionadaVisualmente ? 2 : 1.5,
+                              borderColor: selecionadaVisualmente ? theme.yellow2 : estilo.borda,
+                              borderWidth: selecionadaVisualmente ? 2 : 1,
                             },
                           ]}
                         >
-                          <Text style={{ fontSize: 11, color: selecionadaVisualmente ? theme.yellow9 : estilo.texto, fontWeight: '600' }}>{dia}/{mes}</Text>
-                          <Text style={{ fontSize: 13, fontWeight: '800', color: selecionadaVisualmente ? theme.yellow9 : estilo.texto, marginTop: 2 }}>{hora}:{min}</Text>
-                          <Text style={{ fontSize: 9, fontWeight: '700', color: selecionadaVisualmente ? theme.yellow9 : estilo.texto, marginTop: 3 }}>
+                          <Text style={[tipografia.caption, { color: selecionadaVisualmente ? theme.yellow9 : estilo.texto }]}>{dia}/{mes}</Text>
+                          <Text style={[tipografia.body, { fontWeight: '600', color: selecionadaVisualmente ? theme.yellow9 : estilo.texto, }]}>{hora}:{min}</Text>
+                          <Text style={[tipografia.caption, { fontWeight: '600', color: selecionadaVisualmente ? theme.yellow9 : estilo.texto, marginTop: 3 }]}>
                             {selecionadaVisualmente ? 'Selecionado' : estilo.label}
                           </Text>
                         </TouchableOpacity>
@@ -1394,14 +1438,14 @@ function ModalVerMaisMed({
                       style={{
                         padding: 6,
                         backgroundColor: theme.inputBg,
-                        borderRadius: 8,
+                        borderRadius: 899,
                         borderWidth: 1,
                         borderColor: theme.border,
                       }}
                     >
                       <Image
                         source={require('@/img/icons/setaEsquerda.svg')}
-                        style={{ width: 14, height: 14, tintColor: theme.textPrimary }}
+                        style={{ width: 16, height: 16, tintColor: theme.textPrimary }}
                       />
                     </TouchableOpacity>
 
@@ -1435,14 +1479,14 @@ function ModalVerMaisMed({
                       style={{
                         padding: 6,
                         backgroundColor: theme.inputBg,
-                        borderRadius: 8,
+                        borderRadius: 999,
                         borderWidth: 1,
                         borderColor: theme.border,
                       }}
                     >
                       <Image
                         source={require('@/img/icons/setaDireita.svg')}
-                        style={{ width: 14, height: 14, tintColor: theme.textPrimary }}
+                        style={{ width: 16, height: 16, tintColor: theme.textPrimary }}
                       />
                     </TouchableOpacity>
                   </View>
@@ -1451,7 +1495,7 @@ function ModalVerMaisMed({
 
               {Boolean(medAtual?.hospital) && (
                 <InfoRow
-                  icon="🏥"
+                  icon={require('@/img/icons/hospital.svg')}
                   label="Hospital / Farmácia"
                   value={medAtual.hospital}
                   theme={theme}
@@ -1528,7 +1572,7 @@ function ModalAcaoDose({ doseSelecionada, salvandoDose, theme, onConfirmar, onFe
               : `Confirmar que o medicamento "${doseSelecionada.medicamento.nome}" foi administrado nesta data e horário?`}
           </Text>
 
-          <View style={{ width: '100%', gap: 10 }}>
+          <View style={{ width: '100%', gap: 8 }}>
             <ButtonPrimary
               texto={salvandoDose ? 'Atualizando...' : doseSelecionada.jaTomou ? 'Desmarcar dose' : 'Marcar como tomado'}
               onPress={onConfirmar}
@@ -1644,7 +1688,7 @@ function InfoRow({ icon, label, value, theme }: { icon: string | ImageSourceProp
       {iconeEhTexto ? (
         <Text style={{ fontSize: 16, marginTop: 1 }}>{icon}</Text>
       ) : (
-        <Image source={icon} style={{ width: 20, height: 20, marginTop: 2, tintColor: theme.gray4 }} resizeMode="contain" />
+        <Image source={icon} style={{ width: 24, height: 24, marginTop: 2, tintColor: theme.gray4 }} resizeMode="contain" />
       )}
       <View style={{ flex: 1 }}>
         <Text style={[tipografia.caption, { color: theme.textSecondary }]}>{label}</Text>

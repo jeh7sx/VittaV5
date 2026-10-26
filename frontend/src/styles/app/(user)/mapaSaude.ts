@@ -25,7 +25,7 @@ export const getStyles = (theme: ThemeColors) =>
       borderRadius: 24,
       borderWidth: 1,
       borderColor: theme.border,
-      padding: 20,
+      paddingHorizontal: 24,
       gap: 16,
     },
     inputBuscaContainer: {
@@ -34,16 +34,17 @@ export const getStyles = (theme: ThemeColors) =>
       backgroundColor: theme.inputBg,
       borderWidth: 1,
       borderColor: theme.border,
-      borderRadius: 16,
+      borderRadius: 999,
       paddingHorizontal: 14,
       height: 48,
-      gap: 10,
+      gap: 8,
     },
     inputBusca: {
       flex: 1,
-      fontSize: 14,
+      fontSize: 16,
       color: theme.textPrimary,
       paddingVertical: 0,
+      outlineColor: 'transparent'
     },
     chipsFiltroContainer: {
       gap: 8,
@@ -52,19 +53,19 @@ export const getStyles = (theme: ThemeColors) =>
     chipFiltro: {
       borderRadius: 20,
       paddingVertical: 8,
-      paddingHorizontal: 14,
+      paddingHorizontal: 16,
       borderWidth: 1,
       borderColor: theme.border,
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 6,
+      gap: 8,
     },
     chipFiltroAtivo: {
       backgroundColor: theme.yellow5,
       borderColor: 'transparent',
     },
     listaCards: {
-      gap: 12,
+      gap: 8,
     },
     cardLocal: {
       backgroundColor: theme.cardBg,
@@ -72,7 +73,7 @@ export const getStyles = (theme: ThemeColors) =>
       borderWidth: 1,
       borderColor: theme.border,
       padding: 16,
-      gap: 12,
+      gap: 16,
     },
     cardLocalSelecionado: {
       borderColor: theme.yellow5,
@@ -81,7 +82,7 @@ export const getStyles = (theme: ThemeColors) =>
     cardLocalHeader: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      gap: 12,
+      gap: 16,
     },
     iconeTipoBox: {
       width: 40,
@@ -94,7 +95,7 @@ export const getStyles = (theme: ThemeColors) =>
       flexDirection: 'row',
       alignItems: 'center',
       flexWrap: 'wrap',
-      gap: 6,
+      gap: 8,
       marginTop: 4,
     },
     badgeTag: {

@@ -113,8 +113,8 @@ export default function ButtonSecondary({
           <Image
             source={icone}
             style={{
-              width: 18,
-              height: 18,
+              width: 24,
+              height: 24,
               tintColor: theme.textPrimary,
               flexShrink: 0,
             }}

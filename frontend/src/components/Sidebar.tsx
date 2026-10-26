@@ -301,7 +301,7 @@ export default function Sidebar() {
                     ? require('@/img/icons/sideBar.svg')
                     : require('@/img/icons/sideBarClosed.svg')
                 }
-                style={{ width: 24, height: 24, tintColor: theme.yellow5 }}
+                style={{ width: 24, height: 24, tintColor: theme.black }}
                 resizeMode="contain"
               />
             </TouchableOpacity>
@@ -346,12 +346,12 @@ export default function Sidebar() {
               {exibirTexto && (
                 <View style={{ flex: 1, minWidth: 0 }}>
                   {!filhoSelecionado ? (
-                    <ActivityIndicator size="small" color={theme.yellow5} />
+                    <ActivityIndicator size="small" color={theme.black} />
                   ) : (
                     <Text
                       style={[
                         tipografia.body,
-                        { color: theme.yellow5 }
+                        { color: theme.black }
                       ]}
                       numberOfLines={1}
                     >

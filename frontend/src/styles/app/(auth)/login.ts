@@ -39,14 +39,17 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+    height: '100%',
+    
   },
   cardFormulario: {
     justifyContent: 'center',
     width: '100%',
-    maxWidth: 620,
+    // maxWidth: 620,
+    height: '100%',
     backgroundColor: colors.white,
     borderRadius: 24,
-    paddingHorizontal: 54,
+    paddingHorizontal: 164,
     paddingVertical: 36,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 12 },
@@ -148,7 +151,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8,
+    // marginTop: 8,
   },
   footerText: {
     color: '#666666',
@@ -166,6 +169,6 @@ export const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    // paddingHorizontal: 20,
   },
 });

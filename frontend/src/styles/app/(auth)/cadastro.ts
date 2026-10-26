@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
+
   inputErro: {
     borderColor: cores.borderErro,
   },
@@ -57,14 +57,15 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+    height: '100%'
   },
   cardFormulario: {
+    height: '100%',
     justifyContent: 'center',
     width: '100%',
-    maxWidth: 620,
     backgroundColor: colors.white,
     borderRadius: 24,
-    paddingHorizontal: 54,
+    paddingHorizontal: 164,
     paddingVertical: 36,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 12 },
@@ -142,7 +143,7 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.white,
     gap: 10,
   },
-  
+
   fieldGroup: {
     marginBottom: 12,
     gap: 6,
@@ -159,8 +160,8 @@ export const styles = StyleSheet.create({
     borderColor: colors.gray1,
     borderRadius: 16,
     paddingHorizontal: 20,
-    paddingVertical: 14,
-    backgroundColor: colors.white,
+    paddingVertical: 16,
+    backgroundColor: colors.inputBg,
     color: colors.gray5,
   },
   passwordWrapper: {
@@ -168,7 +169,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
- 
+
   eyeButton: {
     marginLeft: 6,
     paddingVertical: 6,

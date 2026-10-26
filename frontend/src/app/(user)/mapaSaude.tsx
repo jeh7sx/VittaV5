@@ -995,7 +995,7 @@ export default function RedeSaude() {
           >
             <View>
               <Text style={[isMobile ? tipografia.h3 : tipografia.h2, { color: theme.textPrimary }]}>
-                Onde Atender & Emergência
+             Mapa de Saúde
               </Text>
               <Text style={[tipografia.caption, { color: theme.textSecondary, marginTop: 2 }]} numberOfLines={1}>
                 Ponto de partida: <Text style={{ color: theme.yellow6, fontWeight: '700' }}>{origemAtual.nome}</Text>
@@ -1012,21 +1012,17 @@ export default function RedeSaude() {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 6,
+                  gap: 8,
                   backgroundColor: theme.delete || '#C31F1F',
                   paddingVertical: 10,
                   paddingHorizontal: 14,
                   borderRadius: 999,
-                  shadowColor: '#C31F1F',
-                  shadowOffset: { width: 0, height: 3 },
-                  shadowOpacity: 0.35,
-                  shadowRadius: 6,
-                  elevation: 4,
+                  
                 }}
               >
                 <Image source={emergencia} style={{ width: 16, height: 16, tintColor: '#FFFFFF' }} resizeMode="contain" />
-                <Text style={{ color: '#FFFFFF', fontWeight: '800', fontSize: isMobile ? 12 : 13 }}>
-                  {isMobile ? 'SOS Hospital' : 'EMERGÊNCIA: HOSPITAL MAIS PRÓXIMO'}
+                <Text style={[tipografia.body, { color: '#FFFFFF',}]}>
+                  {isMobile ? 'SOS Hospital' : 'Hospital mais próximo'}
                 </Text>
               </TouchableOpacity>
 
@@ -1037,10 +1033,10 @@ export default function RedeSaude() {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 5,
+                  gap: 8,
                   backgroundColor: theme.cardBg,
-                  paddingVertical: 9,
-                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                  paddingHorizontal: 16,
                   borderRadius: 999,
                   borderWidth: 1,
                   borderColor: theme.border,
@@ -1049,9 +1045,9 @@ export default function RedeSaude() {
                 {obtendoGPS ? (
                   <ActivityIndicator size="small" color={theme.yellow5} />
                 ) : (
-                  <Image source={updateGps} style={{ width: 15, height: 15, tintColor: theme.yellow5 }} resizeMode="contain" />
+                  <Image source={updateGps} style={{ width: 16, height: 16, tintColor: theme.black }} resizeMode="contain" />
                 )}
-                <Text style={[tipografia.caption, { color: theme.textPrimary, fontWeight: '700', fontSize: 12 }]}>
+                <Text style={[tipografia.body, { color: theme.textPrimary,}]}>
                   Meu GPS
                 </Text>
               </TouchableOpacity>
@@ -1063,17 +1059,17 @@ export default function RedeSaude() {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 5,
+                  gap: 8,
                   backgroundColor: theme.cardBg,
-                  paddingVertical: 9,
-                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                  paddingHorizontal: 16,
                   borderRadius: 999,
                   borderWidth: 1,
                   borderColor: theme.yellow5,
                 }}
               >
                 <Image source={pontoPartida} style={{ width: 14, height: 14, tintColor: theme.yellow6 }} resizeMode="contain" />
-                <Text style={[tipografia.caption, { color: theme.yellow6, fontWeight: '700', fontSize: 12 }]}>
+                <Text style={[tipografia.body, { color: theme.yellow6, }]}>
                   {isMobile ? 'Mudar' : 'Mudar Ponto'}
                 </Text>
               </TouchableOpacity>
@@ -1087,7 +1083,7 @@ export default function RedeSaude() {
                 borderRadius: 16,
                 borderWidth: 1,
                 borderColor: theme.yellow5,
-                padding: 12,
+                padding: 16,
                 marginBottom: 12,
                 gap: 8,
               }}
@@ -1841,7 +1837,7 @@ export default function RedeSaude() {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                gap: 12,
+                gap: 16,
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 6 },
                 shadowOpacity: 0.3,

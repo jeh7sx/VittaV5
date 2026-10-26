@@ -82,8 +82,8 @@ export default function Login() {
                   <Text style={tipografia.h2}>.</Text>
                 </View>*/}
 
-                <View style={{ gap: 23, marginBottom: 24 }}>
-                  <Text style={[tipografia.h1, { width: '100%', maxWidth: 500 }]}>Entre com sua conta</Text>
+                <View style={{ gap: 8, marginBottom: 24 }}>
+                  <Text style={[tipografia.h1, { width: '100%', minWidth: 500, lineHeight: 56 }]}>Entre com sua conta</Text>
                   <Text style={tipografia.bodySecondary}>
                     Comece a organizar o cuidado com mais tranquilidade.
                   </Text>

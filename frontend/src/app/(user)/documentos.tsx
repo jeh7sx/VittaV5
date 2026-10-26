@@ -644,6 +644,7 @@ function CardDocumentoItem({
   onExcluir: () => void;
 }) {
   const isImagem = ['JPG', 'JPEG', 'PNG', 'WEBP', 'GIF'].includes(d.extensao?.toUpperCase());
+  const [hoverAcao, setHoverAcao] = React.useState<string | null>(null); // <-- Adicionar aqui
 
   return (
     <View style={styles.documentCardWrapper}>
@@ -691,21 +692,81 @@ function CardDocumentoItem({
 
         <View style={[styles.docActionColumn, isNarrow && styles.docActionColumnMobile]}>
           <View style={styles.docActionsIcons}>
-            <TouchableOpacity style={styles.iconButton} onPress={onBaixar} accessibilityLabel="Baixar arquivo">
-              <Ionicons name="download-outline" size={22} color={theme.textPrimary} />
-            </TouchableOpacity>
+            {/* Botão Baixar */}
+            <View style={{ position: 'relative', alignItems: 'center' }}>
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={onBaixar}
+                accessibilityLabel="Baixar arquivo"
+                // @ts-ignore
+                onMouseEnter={() => setHoverAcao('baixar')}
+                onMouseLeave={() => setHoverAcao(null)}
+              >
+                <Ionicons name="download-outline" size={22} color={theme.textPrimary} />
+              </TouchableOpacity>
+              {hoverAcao === 'baixar' && (
+                <View style={{ position: 'absolute', bottom: '100%', marginBottom: 4, backgroundColor: '#1E293B', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, zIndex: 9999 }}>
+                  <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '600' }}>Baixar</Text>
+                </View>
+              )}
+            </View>
 
-            <TouchableOpacity style={styles.iconButton} onPress={onVisualizar}>
-              <Image source={require('@/img/icons/view.svg')} style={{ width: 22, height: 22, tintColor: theme.textPrimary }} />
-            </TouchableOpacity>
+            {/* Botão Ver mais (Olho) */}
+            <View style={{ position: 'relative', alignItems: 'center' }}>
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={onVisualizar}
+                accessibilityLabel="Ver mais"
+                // @ts-ignore
+                onMouseEnter={() => setHoverAcao('ver')}
+                onMouseLeave={() => setHoverAcao(null)}
+              >
+                <Image source={require('@/img/icons/view.svg')} style={{ width: 22, height: 22, tintColor: theme.textPrimary }} />
+              </TouchableOpacity>
+              {hoverAcao === 'ver' && (
+                <View style={{ position: 'absolute', bottom: '100%', marginBottom: 4, backgroundColor: '#1E293B', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, zIndex: 9999 }}>
+                  <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '600' }}>Ver mais</Text>
+                </View>
+              )}
+            </View>
 
-            <TouchableOpacity style={styles.iconButton} onPress={onEditar}>
-              <Image source={require('@/img/icons/edit-02.svg')} style={{ width: 22, height: 22, tintColor: theme.textPrimary }} />
-            </TouchableOpacity>
+            {/* Botão Editar (Lápis) */}
+            <View style={{ position: 'relative', alignItems: 'center' }}>
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={onEditar}
+                accessibilityLabel="Editar"
+                // @ts-ignore
+                onMouseEnter={() => setHoverAcao('edit')}
+                onMouseLeave={() => setHoverAcao(null)}
+              >
+                <Image source={require('@/img/icons/edit-02.svg')} style={{ width: 22, height: 22, tintColor: theme.textPrimary }} />
+              </TouchableOpacity>
+              {hoverAcao === 'edit' && (
+                <View style={{ position: 'absolute', bottom: '100%', marginBottom: 4, backgroundColor: '#1E293B', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, zIndex: 9999 }}>
+                  <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '600' }}>Editar</Text>
+                </View>
+              )}
+            </View>
 
-            <TouchableOpacity style={styles.iconButton} onPress={onExcluir}>
-              <Image source={require('@/img/icons/delete-02.svg')} style={{ width: 22, height: 22, tintColor: '#FF4560' }} />
-            </TouchableOpacity>
+            {/* Botão Excluir (Lixo) */}
+            <View style={{ position: 'relative', alignItems: 'center' }}>
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={onExcluir}
+                accessibilityLabel="Excluir"
+                // @ts-ignore
+                onMouseEnter={() => setHoverAcao('del')}
+                onMouseLeave={() => setHoverAcao(null)}
+              >
+                <Image source={require('@/img/icons/delete-02.svg')} style={{ width: 22, height: 22, tintColor: '#FF4560' }} />
+              </TouchableOpacity>
+              {hoverAcao === 'del' && (
+                <View style={{ position: 'absolute', bottom: '100%', marginBottom: 4, backgroundColor: '#1E293B', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, zIndex: 9999 }}>
+                  <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '600' }}>Excluir</Text>
+                </View>
+              )}
+            </View>
           </View>
 
           <View style={styles.colorIndicatorRow}>
