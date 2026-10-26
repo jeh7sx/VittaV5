@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -27,7 +27,13 @@ import { ReviewExameCard } from './vittaIA/ReviewExameCard';
 import { ReviewMedicamentoCard } from './vittaIA/ReviewMedicamentoCard';
 import { ReviewConsultaCard } from './vittaIA/ReviewConsultaCard';
 import { CardSuporteAnexo } from './vittaIA/CardSuporteAnexo';
-import { MedicamentoData, ConsultaData, ExameData, ChatSession } from '@/types/vittaIa';
+import {
+  MedicamentoData,
+  ConsultaData,
+  ExameData,
+  SuporteData,
+  ChatSession,
+} from '@/types/vittaIa';
 
 export default function VittaIA() {
   const { width } = useWindowDimensions();
@@ -38,8 +44,13 @@ export default function VittaIA() {
   const { filhoSelecionado } = useFilho();
   const usuario = auth.currentUser;
 
+  const scrollRef = useRef<ScrollView>(null);
+
   const [abaAtiva, setAbaAtiva] = useState<'chat' | 'biblioteca'>('chat');
   const [mensagemCopiada, setMensagemCopiada] = useState<number | null>(null);
+
+  // Registo de índices de mensagens cujo cartão de suporte foi fechado pelo utilizador
+  const [suportesFechados, setSuportesFechados] = useState<Record<number, boolean>>({});
 
   const [itensBiblioteca, setItensBiblioteca] = useState<{
     medicamentos: MedicamentoData[];
@@ -76,13 +87,23 @@ export default function VittaIA() {
   } = useVittaIA();
 
   const podeEnviar = inputTexto.trim().length > 0 && !carregando;
-  const temAcaoPendente = !!(examePendente || medicamentoPendente || consultaPendente || suportePendente);
-
   const [chatsLocais, setChatsLocais] = useState<ChatSession[]>([]);
 
   useEffect(() => {
     setChatsLocais(historicoChats);
   }, [historicoChats]);
+
+  // Rola até ao fim ao receber novas respostas
+  useEffect(() => {
+    setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }, 120);
+  }, [mensagens.length, suportePendente]);
+
+  const fecharCardMensagem = (index: number) => {
+    setSuportesFechados((prev) => ({ ...prev, [index]: true }));
+    fecharSuporteEResetar();
+  };
 
   async function carregarBiblioteca() {
     if (!usuario?.uid || !filhoSelecionado?.id) return;
@@ -115,9 +136,18 @@ export default function VittaIA() {
       ]);
 
       setItensBiblioteca({
-        medicamentos: snapMed.docs.map((d) => ({ id: d.id, ...(d.data() as MedicamentoData) })),
-        consultas: snapCons.docs.map((d) => ({ id: d.id, ...(d.data() as ConsultaData) })),
-        exames: snapEx.docs.map((d) => ({ id: d.id, ...(d.data() as ExameData) })),
+        medicamentos: snapMed.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as MedicamentoData),
+        })),
+        consultas: snapCons.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as ConsultaData),
+        })),
+        exames: snapEx.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as ExameData),
+        })),
       });
     } catch (e) {
       console.error('Erro ao carregar biblioteca da IA:', e);
@@ -145,7 +175,6 @@ export default function VittaIA() {
     await carregarBiblioteca();
   };
 
-  // Texto adaptável conforme largura do ecrã
   const placeholderResponsivo =
     modoAtivo === 'assistente'
       ? isPequeno
@@ -178,7 +207,12 @@ export default function VittaIA() {
 
       <View style={{ flex: 1, minWidth: 0, height: '100%' }}>
         {!filhoSelecionado && (
-          <View style={[styles.alerta, { backgroundColor: theme.yellow1, borderColor: theme.yellow5 }]}>
+          <View
+            style={[
+              styles.alerta,
+              { backgroundColor: theme.yellow1, borderColor: theme.yellow5 },
+            ]}
+          >
             <Text style={[styles.alertaTexto, { color: theme.yellow9 }]}>
               Selecione um filho antes de criar exames, remédios ou consultas.
             </Text>
@@ -191,29 +225,72 @@ export default function VittaIA() {
             contentContainerStyle={{ paddingBottom: 40 }}
           >
             <View style={{ marginBottom: 24 }}>
-              <Text style={[tipografia.h2, { color: theme.textPrimary }]}>Biblioteca VittaIA</Text>
-              <Text style={[tipografia.bodySecondary, { color: theme.textSecondary }]}>
+              <Text style={[tipografia.h2, { color: theme.textPrimary }]}>
+                Biblioteca VittaIA
+              </Text>
+              <Text
+                style={[
+                  tipografia.bodySecondary,
+                  { color: theme.textSecondary },
+                ]}
+              >
                 Itens e agendamentos processados e criados exclusivamente com a IA.
               </Text>
             </View>
 
             {carregandoBiblio ? (
-              <ActivityIndicator size="large" color="#F7B500" style={{ marginTop: 40 }} />
+              <ActivityIndicator
+                size="large"
+                color="#F7B500"
+                style={{ marginTop: 40 }}
+              />
             ) : (
               <View style={{ gap: 24 }}>
                 <View>
-                  <Text style={[tipografia.h3, { fontSize: 18, marginBottom: 10, color: theme.Med }]}>
-                    💊 Medicamentos Criados pela IA ({itensBiblioteca.medicamentos.length})
+                  <Text
+                    style={[
+                      tipografia.h3,
+                      { fontSize: 18, marginBottom: 10, color: theme.Med },
+                    ]}
+                  >
+                    💊 Medicamentos Criados pela IA (
+                    {itensBiblioteca.medicamentos.length})
                   </Text>
                   {itensBiblioteca.medicamentos.length === 0 ? (
-                    <Text style={{ color: theme.textSecondary }}>Nenhum medicamento criado pela IA ainda.</Text>
+                    <Text style={{ color: theme.textSecondary }}>
+                      Nenhum medicamento criado pela IA ainda.
+                    </Text>
                   ) : (
                     itensBiblioteca.medicamentos.map((m, idx) => (
-                      <View key={m.id || idx} style={[cardBibliotecaEstilo, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-                        <Text style={{ fontWeight: '700', fontSize: 15, color: theme.textPrimary }}>{m.nome}</Text>
-                        <Text style={{ color: theme.textSecondary, fontSize: 13 }}>Dosagem: {m.dosagem} • Frequência: {m.frequencia}</Text>
-                        <Text style={{ color: theme.textSecondary, fontSize: 12 }}>
-                          Horário: {m.horario || '—'} • Início: {m.dataInicio || '—'}
+                      <View
+                        key={m.id || idx}
+                        style={[
+                          cardBibliotecaEstilo,
+                          {
+                            backgroundColor: theme.cardBg,
+                            borderColor: theme.border,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={{
+                            fontWeight: '700',
+                            fontSize: 15,
+                            color: theme.textPrimary,
+                          }}
+                        >
+                          {m.nome}
+                        </Text>
+                        <Text
+                          style={{ color: theme.textSecondary, fontSize: 13 }}
+                        >
+                          Dosagem: {m.dosagem} • Frequência: {m.frequencia}
+                        </Text>
+                        <Text
+                          style={{ color: theme.textSecondary, fontSize: 12 }}
+                        >
+                          Horário: {m.horario || '—'} • Início:{' '}
+                          {m.dataInicio || '—'}
                           {m.dataTermino ? ` até ${m.dataTermino}` : ''}
                         </Text>
                       </View>
@@ -222,34 +299,90 @@ export default function VittaIA() {
                 </View>
 
                 <View>
-                  <Text style={[tipografia.h3, { fontSize: 18, marginBottom: 10, color: theme.Consul }]}>
-                    🩺 Consultas Agendadas pela IA ({itensBiblioteca.consultas.length})
+                  <Text
+                    style={[
+                      tipografia.h3,
+                      { fontSize: 18, marginBottom: 10, color: theme.Consul },
+                    ]}
+                  >
+                    🩺 Consultas Agendadas pela IA (
+                    {itensBiblioteca.consultas.length})
                   </Text>
                   {itensBiblioteca.consultas.length === 0 ? (
-                    <Text style={{ color: theme.textSecondary }}>Nenhuma consulta agendada pela IA ainda.</Text>
+                    <Text style={{ color: theme.textSecondary }}>
+                      Nenhuma consulta agendada pela IA ainda.
+                    </Text>
                   ) : (
                     itensBiblioteca.consultas.map((c, idx) => (
-                      <View key={c.id || idx} style={[cardBibliotecaEstilo, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-                        <Text style={{ fontWeight: '700', fontSize: 15, color: theme.textPrimary }}>
+                      <View
+                        key={c.id || idx}
+                        style={[
+                          cardBibliotecaEstilo,
+                          {
+                            backgroundColor: theme.cardBg,
+                            borderColor: theme.border,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={{
+                            fontWeight: '700',
+                            fontSize: 15,
+                            color: theme.textPrimary,
+                          }}
+                        >
                           {c.consulta || c.especialidade || 'Consulta Médica'}
                         </Text>
-                        <Text style={{ color: theme.textSecondary, fontSize: 13 }}>Data: {c.dataConsulta} às {c.horario || '—'}</Text>
+                        <Text
+                          style={{ color: theme.textSecondary, fontSize: 13 }}
+                        >
+                          Data: {c.dataConsulta} às {c.horario || '—'}
+                        </Text>
                       </View>
                     ))
                   )}
                 </View>
 
                 <View>
-                  <Text style={[tipografia.h3, { fontSize: 18, marginBottom: 10, color: theme.Exame }]}>
-                    🧪 Exames Registrados pela IA ({itensBiblioteca.exames.length})
+                  <Text
+                    style={[
+                      tipografia.h3,
+                      { fontSize: 18, marginBottom: 10, color: theme.Exame },
+                    ]}
+                  >
+                    🧪 Exames Registrados pela IA ({itensBiblioteca.exames.length}
+                    )
                   </Text>
                   {itensBiblioteca.exames.length === 0 ? (
-                    <Text style={{ color: theme.textSecondary }}>Nenhum exame registrado pela IA ainda.</Text>
+                    <Text style={{ color: theme.textSecondary }}>
+                      Nenhum exame registrado pela IA ainda.
+                    </Text>
                   ) : (
                     itensBiblioteca.exames.map((e, idx) => (
-                      <View key={e.id || idx} style={[cardBibliotecaEstilo, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-                        <Text style={{ fontWeight: '700', fontSize: 15, color: theme.textPrimary }}>{e.titulo}</Text>
-                        <Text style={{ color: theme.textSecondary, fontSize: 13 }}>Data: {e.dataExame} às {e.horario || '—'}</Text>
+                      <View
+                        key={e.id || idx}
+                        style={[
+                          cardBibliotecaEstilo,
+                          {
+                            backgroundColor: theme.cardBg,
+                            borderColor: theme.border,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={{
+                            fontWeight: '700',
+                            fontSize: 15,
+                            color: theme.textPrimary,
+                          }}
+                        >
+                          {e.titulo}
+                        </Text>
+                        <Text
+                          style={{ color: theme.textSecondary, fontSize: 13 }}
+                        >
+                          Data: {e.dataExame} às {e.horario || '—'}
+                        </Text>
                       </View>
                     ))
                   )}
@@ -260,24 +393,46 @@ export default function VittaIA() {
         ) : (
           <View style={{ flex: 1, justifyContent: 'space-between' }}>
             <ScrollView
+              ref={scrollRef}
               style={{ flex: 1 }}
-              contentContainerStyle={[
-                { paddingHorizontal: isMobile ? 16 : 40, paddingTop: 30, paddingBottom: 20 },
-                mensagens.length === 0 && !temAcaoPendente && {
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                },
-              ]}
+              contentContainerStyle={{
+                paddingHorizontal: isMobile ? 16 : 40,
+                paddingTop: 24,
+                paddingBottom: 40,
+                flexGrow: 1,
+              }}
               keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
+              showsVerticalScrollIndicator={true}
             >
-              {mensagens.length === 0 && !temAcaoPendente && (
-                <View style={{ alignItems: 'center', marginBottom: 20 }}>
-                  <Text style={[tipografia.h2, { color: theme.textPrimary, textAlign: 'center' }]}>
-                    Precisando de ajuda? Peça ao <Text style={[tipografia.h2, { color: theme.yellow5 }]}>VittaIA!</Text>
+              {mensagens.length === 0 && (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingVertical: 32,
+                  }}
+                >
+                  <Text
+                    style={[
+                      tipografia.h2,
+                      { color: theme.textPrimary, textAlign: 'center' },
+                    ]}
+                  >
+                    Precisando de ajuda? Peça ao{' '}
+                    <Text style={[tipografia.h2, { color: theme.yellow5 }]}>
+                      VittaIA!
+                    </Text>
                   </Text>
-                  <Text style={{ fontSize: isPequeno ? 13 : 14, color: theme.textSecondary, marginTop: 8, textAlign: 'center', maxWidth: 460 }}>
+                  <Text
+                    style={{
+                      fontSize: isPequeno ? 13 : 14,
+                      color: theme.textSecondary,
+                      marginTop: 8,
+                      textAlign: 'center',
+                      maxWidth: 460,
+                    }}
+                  >
                     {modoAtivo === 'assistente'
                       ? 'Estou pronta para ajudar na rotina oncológica, horários de remédios e exames.'
                       : 'Estou em modo suporte para tirar dúvidas sobre o app ou conectar você à nossa equipe.'}
@@ -288,59 +443,107 @@ export default function VittaIA() {
               {mensagens.map((msg, index) => {
                 const ehUsuario = msg.autor === 'usuario';
 
+                // Aparece caso seja ação ou contenha o texto e não tenha sido fechado
+                const deveExibirSuporte =
+                  !ehUsuario &&
+                  (msg.tipo === 'acao_suporte' || msg.texto?.includes('Preparei uma solicitação')) &&
+                  !suportesFechados[index];
+
                 return (
-                  <View
-                    key={`${msg.autor}-${index}`}
-                    style={[
-                      styles.mensagemLinha,
-                      ehUsuario ? styles.mensagemLinhaUsuario : styles.mensagemLinhaIA,
-                    ]}
-                  >
+                  <View key={`${msg.autor}-${index}`} style={{ marginBottom: 12 }}>
                     <View
                       style={[
-                        styles.mensagemContainer,
-                        ehUsuario ? styles.mensagemContainerUsuario : styles.mensagemContainerIA,
+                        styles.mensagemLinha,
+                        ehUsuario
+                          ? styles.mensagemLinhaUsuario
+                          : styles.mensagemLinhaIA,
                       ]}
                     >
                       <View
                         style={[
+                          styles.mensagemContainer,
                           ehUsuario
-                            ? [styles.bolhaUsuario, { backgroundColor: theme.yellow5 }]
-                            : [styles.bolhaIA, { backgroundColor: theme.cardBg, borderColor: theme.border, borderWidth: 1 }],
+                            ? styles.mensagemContainerUsuario
+                            : styles.mensagemContainerIA,
                         ]}
                       >
-                        <Text
+                        <View
                           style={[
-                            styles.textoMensagem,
                             ehUsuario
-                              ? { color: theme.id === 'dark' ? '#000' : '#FFF' }
-                              : { color: theme.textPrimary },
+                              ? [
+                                  styles.bolhaUsuario,
+                                  { backgroundColor: theme.yellow5 },
+                                ]
+                              : [
+                                  styles.bolhaIA,
+                                  {
+                                    backgroundColor: theme.cardBg,
+                                    borderColor: theme.border,
+                                    borderWidth: 1,
+                                  },
+                                ],
                           ]}
                         >
-                          {msg.texto}
-                        </Text>
-                      </View>
+                          <Text
+                            style={[
+                              styles.textoMensagem,
+                              ehUsuario
+                                ? { color: theme.id === 'dark' ? '#000' : '#FFF' }
+                                : { color: theme.textPrimary },
+                            ]}
+                          >
+                            {msg.texto}
+                          </Text>
+                        </View>
 
-                      <TouchableOpacity
-                        onPress={() => copiarMensagem(msg.texto, index)}
-                        style={[
-                          styles.botaoCopiar,
-                          ehUsuario ? styles.botaoCopiarUsuario : styles.botaoCopiarIA,
-                        ]}
-                        activeOpacity={0.7}
-                      >
-                        <Text style={[tipografia.bodySecondary, { color: theme.textSecondary }]}>
+                        <TouchableOpacity
+                          onPress={() => copiarMensagem(msg.texto, index)}
+                          style={[
+                            styles.botaoCopiar,
+                            ehUsuario
+                              ? styles.botaoCopiarUsuario
+                              : styles.botaoCopiarIA,
+                          ]}
+                          activeOpacity={0.7}
+                        >
                           {mensagemCopiada === index ? (
-                            'Copiado!'
+                            <Text
+                              style={[
+                                tipografia.caption,
+                                { color: theme.textSecondary },
+                              ]}
+                            >
+                              Copiado!
+                            </Text>
                           ) : (
                             <Image
                               source={require('@/img/icons/copy.svg')}
-                              style={{ width: 20, height: 20, tintColor: theme.gray4 }}
+                              style={{
+                                width: 18,
+                                height: 18,
+                                tintColor: theme.gray4,
+                              }}
                             />
                           )}
-                        </Text>
-                      </TouchableOpacity>
+                        </TouchableOpacity>
+                      </View>
                     </View>
+
+                    {deveExibirSuporte && (
+                      <View style={{ marginTop: 8 }}>
+                        <CardSuporteAnexo
+                          dados={
+                            (msg.dados as SuporteData) ||
+                            suportePendente || {
+                              email: 'vittaetec@gmail.com',
+                              assunto: 'Solicitação de Suporte Vitta',
+                              corpo: 'Preciso de suporte com a minha conta Vitta.',
+                            }
+                          }
+                          onFechar={() => fecharCardMensagem(index)}
+                        />
+                      </View>
+                    )}
                   </View>
                 );
               })}
@@ -348,16 +551,25 @@ export default function VittaIA() {
               {carregando && (
                 <View style={styles.carregando}>
                   <ActivityIndicator size="large" color="#F7B500" />
-                  <Text style={[tipografia.caption, { color: theme.textSecondary }]}>VittaIA está pensando...</Text>
+                  <Text
+                    style={[
+                      tipografia.caption,
+                      { color: theme.textSecondary },
+                    ]}
+                  >
+                    VittaIA está pensando...
+                  </Text>
                 </View>
               )}
 
-              {/* Cards de Ação Pendente */}
+              {/* Cards adicionais de Exame, Medicamento e Consulta */}
               {examePendente && (
                 <ReviewExameCard
                   dados={examePendente}
                   onChange={(campo, valor) =>
-                    setExamePendente((prev) => (prev ? { ...prev, [campo]: valor } : prev))
+                    setExamePendente((prev) =>
+                      prev ? { ...prev, [campo]: valor } : prev
+                    )
                   }
                   onSalvar={confirmarExame}
                   onCancelar={() => setExamePendente(null)}
@@ -369,7 +581,9 @@ export default function VittaIA() {
                 <ReviewMedicamentoCard
                   dados={medicamentoPendente}
                   onChange={(campo, valor) =>
-                    setMedicamentoPendente((prev) => (prev ? { ...prev, [campo]: valor } : prev))
+                    setMedicamentoPendente((prev) =>
+                      prev ? { ...prev, [campo]: valor } : prev
+                    )
                   }
                   onSalvar={handleConfirmarMedicamento}
                   onCancelar={() => setMedicamentoPendente(null)}
@@ -381,24 +595,25 @@ export default function VittaIA() {
                 <ReviewConsultaCard
                   dados={consultaPendente}
                   onChange={(campo, valor) =>
-                    setConsultaPendente((prev) => (prev ? { ...prev, [campo]: valor } : prev))
+                    setConsultaPendente((prev) =>
+                      prev ? { ...prev, [campo]: valor } : prev
+                    )
                   }
                   onSalvar={confirmarConsulta}
                   onCancelar={() => setConsultaPendente(null)}
                   salvando={salvandoAcao}
                 />
               )}
-
-              {suportePendente && (
-                <CardSuporteAnexo
-                  dados={suportePendente}
-                  onFechar={fecharSuporteEResetar}
-                />
-              )}
             </ScrollView>
 
-            {/* Rodapé: Seletor de Modo + Campo de Mensagem */}
-            <View style={{ paddingHorizontal: isMobile ? 16 : 40, paddingBottom: 24, alignItems: 'center' }}>
+            {/* Rodapé: Seletor de Modo + Entrada de Texto */}
+            <View
+              style={{
+                paddingHorizontal: isMobile ? 16 : 40,
+                paddingBottom: 24,
+                alignItems: 'center',
+              }}
+            >
               <View
                 style={{
                   flexDirection: 'row',
@@ -420,19 +635,29 @@ export default function VittaIA() {
                     paddingVertical: 6,
                     paddingHorizontal: isPequeno ? 10 : 14,
                     borderRadius: 999,
-                    backgroundColor: modoAtivo === 'assistente' ? theme.cardBg : 'transparent',
+                    backgroundColor:
+                      modoAtivo === 'assistente'
+                        ? theme.cardBg
+                        : 'transparent',
                   }}
                 >
                   <Ionicons
                     name="heart-outline"
                     size={15}
-                    color={modoAtivo === 'assistente' ? theme.yellow6 : theme.textSecondary}
+                    color={
+                      modoAtivo === 'assistente'
+                        ? theme.yellow6
+                        : theme.textSecondary
+                    }
                   />
                   <Text
                     style={{
                       fontSize: isPequeno ? 12 : 13,
                       fontWeight: modoAtivo === 'assistente' ? '700' : '500',
-                      color: modoAtivo === 'assistente' ? theme.textPrimary : theme.textSecondary,
+                      color:
+                        modoAtivo === 'assistente'
+                          ? theme.textPrimary
+                          : theme.textSecondary,
                     }}
                   >
                     Assistente
@@ -448,19 +673,27 @@ export default function VittaIA() {
                     paddingVertical: 6,
                     paddingHorizontal: isPequeno ? 10 : 14,
                     borderRadius: 999,
-                    backgroundColor: modoAtivo === 'suporte' ? theme.cardBg : 'transparent',
+                    backgroundColor:
+                      modoAtivo === 'suporte' ? theme.cardBg : 'transparent',
                   }}
                 >
                   <Ionicons
                     name="help-buoy-outline"
                     size={15}
-                    color={modoAtivo === 'suporte' ? theme.yellow6 : theme.textSecondary}
+                    color={
+                      modoAtivo === 'suporte'
+                        ? theme.yellow6
+                        : theme.textSecondary
+                    }
                   />
                   <Text
                     style={{
                       fontSize: isPequeno ? 12 : 13,
                       fontWeight: modoAtivo === 'suporte' ? '700' : '500',
-                      color: modoAtivo === 'suporte' ? theme.textPrimary : theme.textSecondary,
+                      color:
+                        modoAtivo === 'suporte'
+                          ? theme.textPrimary
+                          : theme.textSecondary,
                     }}
                   >
                     Suporte
@@ -468,7 +701,6 @@ export default function VittaIA() {
                 </TouchableOpacity>
               </View>
 
-              {/* Caixa de Input Responsiva */}
               <View
                 style={{
                   width: '100%',
@@ -517,13 +749,27 @@ export default function VittaIA() {
                   <Ionicons
                     name="arrow-up"
                     size={isPequeno ? 18 : 20}
-                    color={podeEnviar ? (theme.id === 'dark' ? '#000' : '#FFF') : theme.yellow5}
+                    color={
+                      podeEnviar
+                        ? theme.id === 'dark'
+                          ? '#000'
+                          : '#FFF'
+                        : theme.yellow5
+                    }
                   />
                 </TouchableOpacity>
               </View>
 
-              <Text style={{ fontSize: isPequeno ? 11 : 12, color: theme.textSecondary, marginTop: 10, textAlign: 'center' }}>
-                A Vitta IA não fornece diagnósticos. Em caso de dúvidas médicas urgentes, consulte o oncologista.
+              <Text
+                style={{
+                  fontSize: isPequeno ? 11 : 12,
+                  color: theme.textSecondary,
+                  marginTop: 10,
+                  textAlign: 'center',
+                }}
+              >
+                A Vitta IA não fornece diagnósticos. Em caso de dúvidas médicas
+                urgentes, consulte o oncologista.
               </Text>
             </View>
           </View>

@@ -82,10 +82,9 @@ export default function useVittaIA() {
     const [consultaPendente, setConsultaPendente] = useState<ConsultaData | null>(null);
     const [suportePendente, setSuportePendente] = useState<SuporteData | null>(null);
 
-    // 🔄 REINICIA A AÇÃO DE SUPORTE mantendo o contexto da conversa
+    // Reinicia o card de suporte e atualiza o histórico
     const fecharSuporteEResetar = () => {
         setSuportePendente(null);
-        // Converte as mensagens com ação no histórico para mensagens normais de texto
         setMensagens((msgsAnteriores) =>
             msgsAnteriores.map((m) =>
                 m.tipo === 'acao_suporte'
@@ -240,7 +239,6 @@ export default function useVittaIA() {
         const texto = inputTexto.trim();
         if (!texto || carregando) return;
 
-        // Se havia algum suporte aberto, limpa no histórico para que a nova mensagem não repita
         const historicoPreparado = mensagens.map((m) =>
             m.tipo === 'acao_suporte' ? { ...m, tipo: 'mensagem' as const, dados: null } : m
         );
@@ -292,9 +290,21 @@ export default function useVittaIA() {
                 modoAtivo
             );
 
+            // Garante dados estruturados para o suporte mesmo se vierem incompletos do backend
+            const dadosSuporte: SuporteData = resposta.dados || {
+                email: 'vittaetec@gmail.com',
+                assunto: 'Solicitação de Suporte Vitta',
+                corpo: `Olá equipe Vitta,\n\nPreciso de suporte com a seguinte questão:\n${texto}\n\nResponsável: ${usuario?.displayName || usuario?.email || 'Usuário'}`,
+            };
+
             setMensagens((prev) => [
                 ...prev,
-                { autor: 'ia', texto: resposta.mensagem, tipo: resposta.tipo, dados: resposta.dados },
+                {
+                    autor: 'ia',
+                    texto: resposta.mensagem,
+                    tipo: resposta.tipo,
+                    dados: resposta.tipo === 'acao_suporte' ? dadosSuporte : resposta.dados,
+                },
             ]);
 
             if (resposta.tipo === 'acao_exame' && resposta.dados) {
@@ -303,8 +313,8 @@ export default function useVittaIA() {
                 setMedicamentoPendente(normalizarMedicamentoIA(resposta.dados));
             } else if (resposta.tipo === 'acao_consulta' && resposta.dados) {
                 setConsultaPendente({ ...resposta.dados, criadoPorIA: true });
-            } else if (resposta.tipo === 'acao_suporte' && resposta.dados) {
-                setSuportePendente(resposta.dados);
+            } else if (resposta.tipo === 'acao_suporte') {
+                setSuportePendente(dadosSuporte);
             }
 
             carregarChats();
@@ -387,7 +397,7 @@ export default function useVittaIA() {
         setConsultaPendente,
         suportePendente,
         setSuportePendente,
-        fecharSuporteEResetar, // <-- Exportado para uso na tela
+        fecharSuporteEResetar,
         enviarMensagem,
         iniciarNovoChat,
         selecionarChat,
