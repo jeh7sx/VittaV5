@@ -1,8 +1,8 @@
 ## 📌 Sobre o Projeto
 
-O **Vitta** é uma plataforma multiplataforma (Web, Android) desenvolvida para apoiar famílias, cuidadores e responsáveis na organização médica de crianças e adolescentes em tratamento contínuo ou rotina preventiva.
+O **Vitta** é uma plataforma multiplataforma (Web, Mobile) desenvolvida para apoiar famílias, cuidadores e responsáveis na organização médica de crianças e adolescentes em tratamento Oncológico.
 
-A aplicação centraliza o controle de medicamentos prescritos, consultas clínicas, exames laboratoriais/imagem, histórico de laudos e conta com a **Vitta IA**, uma assistente inteligente integrada para esclarecer dúvidas de receitas e apoiar o cronograma familiar.
+A aplicação centraliza o controle de medicamentos prescritos, consultas clínicas, exames, histórico clínico e conta com a **Vitta IA**, uma assistente inteligente integrada para esclarecer dúvidas, prestar suporte e apoiar o cronograma familiar.
 
 ## ✨ Principais Funcionalidades
 
@@ -18,6 +18,16 @@ A aplicação centraliza o controle de medicamentos prescritos, consultas clíni
 
 * Armazenamento de fotos de bulas e embalagens com visualizador integrado.
 
+### 🩺 Gestão Completa de Consultas e Exames
+
+* Registro de titulo, descrição, data, horário.
+
+* Registro visual de status de Consultas/Exames.
+
+* Associação de clínicas, farmácias e hospitais via geolocalização.
+
+* Armazenamento de fotos de Consultas/Exames com visualizador integrado.
+
 ### 📅 Calendário & Compromissos
 
 * Visão mensal e diária integrada da rotina médica.
@@ -32,6 +42,8 @@ A aplicação centraliza o controle de medicamentos prescritos, consultas clíni
 
 * Categorização em pastas estruturadas com compartilhamento rápido em PDF.
 
+* Armazenamento de documentos importante como CPF e RG, tanto dos responsáveis quanto da criança ou adolescente.
+
 ### 👶 Multi-Responsáveis & Perfil
 
 * Acompanhamento simultâneo do mesmo paciente por múltiplos responsáveis (pais, avós, babás).
@@ -45,6 +57,8 @@ A aplicação centraliza o controle de medicamentos prescritos, consultas clíni
 * Esclarecimento de dúvidas sobre receitas e horários de posologia.
 
 * Modal de teste e demonstração interativo acessível inclusive na página institucional aberta.
+
+* Suporte completo do Vitta, ajuda responsáveis a tirar dúvidas e aprender mais sobre o tipo de câncer da criança ou adolescente.
 
 ## 🎨 UI/UX & Padrões de Design
 
@@ -70,11 +84,15 @@ A aplicação centraliza o controle de medicamentos prescritos, consultas clíni
 
 * **Deploy Web:** [Vercel](https://vercel.com/) / Expo Web Export
 
+* **Apis:** [Gemini 3.5 Flash Lite](https://gemini.google.com/app?hl=pt-BR) / [Google Maps](https://www.google.com/maps/)
+
 ## 📂 Estrutura de Pastas
 
 ```
 ├── src/
 │   ├── app/                    # Rotas e páginas (Expo Router)
+│   │   ├── (admin)/            # Rotas autenticadas do administrador
+│   │   ├── (auth)/             # Rotas para autenticação
 │   │   ├── (user)/             # Rotas autenticadas do usuário
 │   │   │   ├── medicamentos.tsx # Painel e modais de medicamentos
 │   │   │   ├── calendario.tsx  # Agenda e compromissos
@@ -91,7 +109,7 @@ A aplicação centraliza o controle de medicamentos prescritos, consultas clíni
 │   ├── controllers/            # Controladores de regras de negócio (hooks customizados)
 │   ├── hooks/                  # Utilitários de lógica e estado
 │   ├── img/                    # Ícones SVG, ilustrações e capturas do app
-│   └── styles/                 # Cores globais (colors.ts) e tipografia (tipografia.ts)
+│   └── styles/                 # Cores globais (colors.ts), tipografia (tipografia.ts) e temas (themes.ts)
 ├── app.json                    # Metadados e configuração da build Expo
 ├── package.json
 └── tsconfig.json
@@ -104,7 +122,7 @@ A aplicação centraliza o controle de medicamentos prescritos, consultas clíni
 
 * Node.js (versão 18 ou superior)
 
-* Gerenciador de pacotes `npm` ou `yarn`
+* Gerenciador de pacotes `npm`
 
 * Expo Go instalado no smartphone (opcional para testes móveis)
 
@@ -150,3 +168,5 @@ npm run build
 Projeto elaborado pelos autores do Vitta.
 
 Contato para suporte e dúvidas: https://www.instagram.com/jeh7.sx/  &  https://www.instagram.com/\_oliveiral\_/
+
+Link da Versão Web: [httpsvittav5-frontend.vercel.app](https://vittav5-frontend.vercel.app/)
