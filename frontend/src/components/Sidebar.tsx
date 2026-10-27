@@ -42,12 +42,12 @@ const MENU_PRINCIPAL: ItemMenu[] = [
   { label: 'Exames', icone: require('@/img/icons/microscope.svg'), rota: '/exames' },
   { label: 'Calendário', icone: require('@/img/icons/calendar-02.svg'), rota: '/calendario' },
   { label: 'Documentos', icone: require('@/img/icons/document.svg'), rota: '/documentos' },
-  { label: 'Mapa', icone: require('@/img/icons/maps.svg'), rota: '/mapaSaude' },
+  { label: 'Mapa', icone: require('@/img/icons/map.svg'), rota: '/mapaSaude' },
 ];
 
 const MENU_CONTA: ItemMenu[] = [
   { label: 'Perfil', icone: require('@/img/icons/user.svg'), rota: '/perfil' },
-  { label: 'Crianças e adolescentes', icone: require('@/img/icons/userGroup.svg'), rota: '/filhos' },
+  { label: 'Crianças e adolescentes', icone: require('@/img/icons/baby.svg'), rota: '/filhos' },
 ];
 
 const LARGURA_ABERTA_MAX = 296;
@@ -230,7 +230,7 @@ export default function Sidebar() {
           width: larguraEfetiva,
           height: '100%',
           backgroundColor: theme.bg,
-          paddingVertical: 8,
+          paddingVertical: 16,
           paddingHorizontal: exibirTexto ? 16 : 8,
           // borderRightWidth: isDesktop ? 1 : 0,
           // borderColor: theme.border,
@@ -256,8 +256,8 @@ export default function Sidebar() {
         ]}
         contentContainerStyle={{
           flexGrow: 1,
-          justifyContent: 'flex-start',
-          paddingBottom: 24,
+          justifyContent: 'space-between',
+          //padding
         }}
       >
         {/* BLOCO SUPERIOR */}
@@ -269,7 +269,7 @@ export default function Sidebar() {
               alignItems: 'center',
               justifyContent: exibirTexto ? 'space-between' : 'center',
               minHeight: 36,
-              paddingTop: !isDesktop ? topoSeguro : 4,
+             
             }}
           >
             {exibirTexto && (
@@ -313,21 +313,21 @@ export default function Sidebar() {
             style={{
               backgroundColor: theme.cardBg,
               borderRadius: 999,
-              paddingVertical: exibirTexto ? 8 : 6,
-              paddingHorizontal: exibirTexto ? 10 : 6,
+              paddingVertical: 16,
+              paddingHorizontal: 16,
               borderWidth: 1,
               borderColor: theme.border,
               flexDirection: 'row',
               alignItems: 'center',
-              gap: exibirTexto ? 8 : 0,
+              gap: 8,
               justifyContent: exibirTexto ? 'space-between' : 'center',
             }}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
               <View
                 style={{
-                  width: 30,
-                  height: 30,
+                  width: 32,
+                  height: 32,
                   borderRadius: 999,
                   backgroundColor: theme.inputBg,
                   overflow: 'hidden',
@@ -339,7 +339,7 @@ export default function Sidebar() {
                 {fotoFilho ? (
                   <Image source={{ uri: fotoFilho }} style={{ width: '100%', height: '100%' }} />
                 ) : (
-                  <Image source={filhoIcon} style={{ width: 18, height: 18 }} />
+                  <Image source={filhoIcon} style={{ width: 24, height: 24 }} />
                 )}
               </View>
 
@@ -365,7 +365,7 @@ export default function Sidebar() {
             {exibirTexto && (
               <Image
                 source={require('@/img/icons/setaDireita.svg')}
-                style={{ width: 16, height: 16, tintColor: theme.gray4 }}
+                style={{ width: 24, height: 24, tintColor: theme.gray4 }}
                 resizeMode="contain"
               />
             )}
@@ -388,8 +388,8 @@ export default function Sidebar() {
                     alignItems: 'center',
                     gap: exibirTexto ? 8 : 0,
                     justifyContent: exibirTexto ? 'flex-start' : 'center',
-                    paddingVertical: 12,
-                    paddingHorizontal: exibirTexto ? 16 : 6,
+                    paddingVertical: 16,
+                    paddingHorizontal: exibirTexto ? 16 : 8,
                     borderRadius: 999,
                     backgroundColor: ativo
                       ? theme.yellow5
@@ -401,8 +401,8 @@ export default function Sidebar() {
                 >
                   <View
                     style={{
-                      width: 22,
-                      height: 22,
+                      width: 24,
+                      height: 24,
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}
@@ -410,8 +410,8 @@ export default function Sidebar() {
                     <Image
                       source={item.icone}
                       style={{
-                        width: 20,
-                        height: 20,
+                        width: 24,
+                        height: 24,
                         tintColor: ativo || hover ? (theme.modo === 'escuro' ? '#000' : theme.yellow9) : theme.gray4,
                       }}
                       resizeMode="contain"
@@ -423,8 +423,8 @@ export default function Sidebar() {
                       style={[
                         tipografia.body,
                         {
-                          fontSize: 13.5,
-                          fontWeight: ativo ? '700' : hover ? '500' : '400',
+                          //fontSize: 13.5,
+                          //fontWeight: ativo ? '700' : hover ? '500' : '400',
                           color: ativo || hover ? (theme.modo === 'escuro' ? '#000' : theme.yellow9) : theme.gray4,
                         },
                       ]}
@@ -438,11 +438,11 @@ export default function Sidebar() {
           </View>
 
           {/* Seção Conta */}
-          <View style={{ gap: 8 }}>
+          <View style={{ gap: 0 }}>
 
             <Text
               style={[
-                tipografia.caption, { color: theme.black }]}
+                tipografia.body, { color: theme.black, paddingHorizontal: 16 }]}
             >
               Conta
             </Text>
@@ -461,10 +461,10 @@ export default function Sidebar() {
                   style={({ pressed }) => ({
                     flexDirection: 'row',
                     alignItems: 'center',
-                    gap: exibirTexto ? 12 : 0,
+                    gap: exibirTexto ? 8 : 0,
                     justifyContent: exibirTexto ? 'flex-start' : 'center',
-                    paddingVertical: 10,
-                    paddingHorizontal: exibirTexto ? 12 : 6,
+                    paddingVertical: 16,
+                    paddingHorizontal: exibirTexto ? 16 : 8,
                     borderRadius: 999,
                     backgroundColor: ativo
                       ? theme.yellow5
@@ -476,8 +476,8 @@ export default function Sidebar() {
                 >
                   <View
                     style={{
-                      width: 20,
-                      height: 20,
+                      width: 24,
+                      height: 24,
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}
@@ -485,8 +485,8 @@ export default function Sidebar() {
                     <Image
                       source={item.icone}
                       style={{
-                        width: 18,
-                        height: 18,
+                        width: 24,
+                        height: 24,
                         tintColor: ativo || hover ? (theme.modo === 'escuro' ? '#000' : theme.yellow9) : theme.gray4,
                       }}
                       resizeMode="contain"
@@ -498,8 +498,7 @@ export default function Sidebar() {
                       style={[
                         tipografia.body,
                         {
-                          fontSize: 13.5,
-                          fontWeight: ativo ? '700' : hover ? '500' : '400',
+                         
                           color: ativo || hover ? (theme.modo === 'escuro' ? '#000' : theme.yellow9) : theme.gray4,
                         },
                       ]}
@@ -530,8 +529,8 @@ export default function Sidebar() {
                   ? theme.yellow1
                   : theme.cardBg,
               borderRadius: 999,
-              paddingVertical: 8,
-              paddingHorizontal: exibirTexto ? 12 : 6,
+              paddingVertical: 16,
+              paddingHorizontal: exibirTexto ? 16 : 8,
               borderWidth: 1,
               borderColor: configAtivo || hoverConfig ? theme.yellow5 : theme.border,
               justifyContent: exibirTexto ? 'space-between' : 'center',
@@ -542,8 +541,8 @@ export default function Sidebar() {
               <Image
                 source={require('@/img/icons/config.svg')}
                 style={{
-                  width: 18,
-                  height: 18,
+                  width: 24,
+                  height: 24,
                   tintColor: configAtivo
                     ? (theme.modo === 'escuro' ? '#000' : theme.yellow9)
                     : theme.textPrimary,
@@ -555,8 +554,7 @@ export default function Sidebar() {
                   style={[
                     tipografia.body,
                     {
-                      fontSize: 12.5,
-                      fontWeight: configAtivo ? '700' : '600',
+                      
                       color: configAtivo
                         ? (theme.modo === 'escuro' ? '#000' : theme.yellow9)
                         : theme.textPrimary,
@@ -573,10 +571,10 @@ export default function Sidebar() {
               <Image
                 source={require('@/img/icons/setaDireita.svg')}
                 style={{
-                  width: 12,
-                  height: 12,
+                  width: 24,
+                  height: 24,
                   tintColor: configAtivo
-                    ? (theme.modo === 'escuro' ? '#000' : theme.gray4)
+                    ? (theme.modo === 'escuro' ? '#000' : theme.gray1)
                     : theme.gray4,
                 }}
                 resizeMode="contain"
@@ -604,7 +602,8 @@ export default function Sidebar() {
                     ? theme.yellow1
                     : theme.cardBg,
                 borderRadius: 999,
-                padding: exibirTexto ? 8 : 6,
+                paddingVertical: 8,
+                paddingHorizontal: 16,
                 borderWidth: 1,
                 borderColor:
                   perfilAtivo || hoverPerfil ? theme.yellow5 : theme.border,
@@ -624,8 +623,8 @@ export default function Sidebar() {
             >
               <View
                 style={{
-                  width: 30,
-                  height: 30,
+                  width: 32,
+                  height: 32,
                   borderRadius: 999,
                   backgroundColor: theme.inputBg,
                   overflow: 'hidden',
@@ -649,13 +648,13 @@ export default function Sidebar() {
               {exibirTexto && (
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Text
-                    style={[{ fontWeight: '600', fontSize: 12.5 }, tipografia.body, { color: theme.textPrimary }]}
+                    style={[ tipografia.body, { color: theme.textPrimary }]}
                     numberOfLines={1}
                   >
                     {usuarioLogado.nome}
                   </Text>
                   <Text
-                    style={[tipografia.caption, { fontSize: 10.5, color: theme.gray4 }]}
+                    style={[tipografia.caption, { color: theme.gray4 }]}
                     numberOfLines={1}
                   >
                     {usuarioLogado.email}
@@ -673,7 +672,7 @@ export default function Sidebar() {
                 accessibilityLabel="Terminar sessão"
                 style={{ padding: 4 }}
               >
-                <IconLogout color={theme.gray4} />
+                <Image source={require('@/img/icons/log-out.svg')}></Image>
               </TouchableOpacity>
             )}
           </Pressable>

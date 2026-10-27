@@ -110,25 +110,25 @@ export const getStyles = (theme: ThemeColors) =>
       borderTopWidth: 1,
       borderTopColor: theme.border,
       paddingTop: 16,
-      gap: 14,
+      gap: 32,
     },
     legendaSecao: {
       gap: 8,
     },
     legendaTitulo: {
-      fontSize: 12,
+      fontSize: 16,
       fontWeight: '600',
       color: theme.textPrimary,
     },
     legendaLinha: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 12,
+      gap: 24,
     },
     legendaItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 6,
+      gap: 8,
     },
     legendaMarcador: {
       width: 7,

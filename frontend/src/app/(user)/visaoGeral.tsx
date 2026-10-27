@@ -266,7 +266,7 @@ export default function VisaoGeral() {
                 {
                   flexDirection: isMobile ? 'column' : 'row',
                   alignItems: 'center',
-                  gap: 24,
+                  gap: 56,
                   width: '100%',
                 },
               ]}
@@ -286,7 +286,7 @@ export default function VisaoGeral() {
               </GraficoProgressoNativo>
 
               <View style={{ flex: 1, minWidth: 200, width: '100%', gap: 24, }}>
-                <View style={{ alignSelf: 'flex-end' }}>
+                <View>
                   <Text style={[tipografia.h3, { color: theme.textPrimary }]}>
                     {configAdesao.concluidos} de {configAdesao.total} {abaAdesao}
                   </Text>
@@ -299,7 +299,7 @@ export default function VisaoGeral() {
                   </Text>
                 </View>
 
-                <View style={{ gap: 8, width: '50%', alignSelf: 'flex-end' }}>
+                <View style={{ gap: 8, width: '50%', }}>
                   <View style={[styles.cardStatus, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
                     <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
                       <Image source={require('@/img/icons/check.svg')} style={[{ tintColor: isDark ? '#86EFAC' : '#166534' }]} />
@@ -312,10 +312,10 @@ export default function VisaoGeral() {
 
                   <View style={[styles.cardStatus, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
                     <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-                      <Image source={require('@/img/icons/atrasado.svg')} />
-                      <Text style={[tipografia.h4, { color: isDark ? '#FCA5A5' : '#c68b01' }]}>Pendentes</Text>
+                      <Image source={require('@/img/icons/atrasado.svg')} style={{ tintColor: isDark ? '#c68b01' : '#c68b01' }} />
+                      <Text style={[tipografia.h4, { color: isDark ? '#c68b01' : '#c68b01' }]}>Pendentes</Text>
                     </View>
-                    <Text style={[tipografia.h4, { color: isDark ? '#F87171' : '#d19c0c' }]}>
+                    <Text style={[tipografia.h4, { color: isDark ? '#d19c0c' : '#d19c0c' }]}>
                       {Math.max(0, configAdesao.total - configAdesao.concluidos)}
                     </Text>
                   </View>
@@ -328,7 +328,7 @@ export default function VisaoGeral() {
           <View style={[styles.secaoProximos, { backgroundColor: theme.cardBg, borderColor: theme.border, flex: isMobile ? undefined : 1, width: isMobile ? '100%' : undefined }]}>
             <View style={styles.secaoProximosHeader}>
               <View style={[styles.iconeBoxStat,]}>
-                <Image source={require('@/img/icons/calendar-02.svg')} style={{ width: 24, height: 24, tintColor: theme.Calendario }} />
+                <Image source={require('@/img/icons/calendar-02.svg')} style={{ width: 24, height: 24, tintColor: theme.yellow6 }} />
               </View>
               <Text style={[tipografia.h4, { color: theme.textPrimary, }]}>Próximos compromissos</Text>
             </View>

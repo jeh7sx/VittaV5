@@ -161,14 +161,14 @@ export const getStyles = (theme: ThemeColors) =>
       justifyContent: 'space-between',
       alignItems: 'center',
       backgroundColor: theme.cardBg,
-      borderRadius: 16,
-      paddingVertical: 14,
-      paddingHorizontal: 16,
+      borderRadius: 24,
+      paddingVertical: 16,
+      paddingHorizontal: 24,
       borderWidth: 1,
       borderColor: theme.border,
       width: '100%',
     },
-
+ 
 
     secaoProximosHeader: {
       flexDirection: 'row',

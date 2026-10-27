@@ -240,24 +240,24 @@ export default function Calendario() {
             {/* Legendas */}
             <View style={[styles.legendaContainer, { borderTopColor: theme.border }]}>
               <View style={styles.legendaSecao}>
-                <Text style={[styles.legendaTitulo, { color: theme.textPrimary }]}>Categorias</Text>
+                <Text style={[tipografia.bodySecondary,]}>Categorias</Text>
                 <View style={styles.legendaLinha}>
                   {Object.values(CORES_CATEGORIA).map((item) => (
                     <View key={item.label} style={styles.legendaItem}>
                       <View style={[styles.legendaMarcador, { backgroundColor: item.dot }]} />
-                      <Text style={[styles.legendaTexto, { color: theme.textSecondary }]}>{item.label}</Text>
+                      <Text style={[tipografia.body, { color: theme.black}]}>{item.label}</Text>
                     </View>
                   ))}
                 </View>
               </View>
 
               <View style={styles.legendaSecao}>
-                <Text style={[styles.legendaTitulo, { color: theme.textPrimary }]}>Status do Dia</Text>
+                <Text style={[tipografia.bodySecondary, ]}>Status do Dia</Text>
                 <View style={styles.legendaLinha}>
                   {Object.values(CORES_STATUS).map((item) => (
                     <View key={item.label} style={styles.legendaItem}>
                       <View style={[styles.legendaMarcador, { backgroundColor: item.dot }]} />
-                      <Text style={[styles.legendaTexto, { color: theme.textSecondary }]}>{item.label}</Text>
+                      <Text style={[tipografia.body, ]}>{item.label}</Text>
                     </View>
                   ))}
                 </View>

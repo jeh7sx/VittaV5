@@ -21,7 +21,7 @@ import { getStyles } from '@/styles/app/(user)/mapaSaude';
 import hospital from '@/img/icons/hospital.svg';
 import maps from '@/img/icons/maps.svg';
 import bike from '@/img/icons/bike.svg';
-import moto from '@/img/icons/motor.svg';
+import moto from '@/img/icons/moto.svg';
 import carro from '@/img/icons/carro.svg';
 import farmacia from '@/img/icons/medicamento.svg';
 import clinica from '@/img/icons/stethoscope-02.svg';
@@ -31,10 +31,13 @@ import satelite from '@/img/icons/satelite.svg';
 import mapaRua from '@/img/icons/mapaRua.svg';
 import lupaPesquisa from '@/img/icons/search-01.svg';
 import telefone from '@/img/icons/call-02.svg';
-import bussola from '@/img/icons/safari.svg';
+import bussola from '@/img/icons/bussola.svg';
 import emergencia from '@/img/icons/siren.svg';
 import updateGps from '@/img/icons/gps-01.svg';
 import pontoPartida from '@/img/icons/pontoPartida.svg';
+import ButtonBlack from '@/components/Buttons/ButtonBlack';
+import ButtonSecondary from '@/components/Buttons/ButtonSecondary';
+import ButtonPrimary from '@/components/Buttons/ButtonPrimary';
 
 export type TipoLocal = 'todos' | 'hospital' | 'farmacia' | 'clinica' | 'comercio';
 export type TipoCamadaMapa = 'satelite' | 'ruas';
@@ -72,9 +75,9 @@ function calcularDistanciaKm(lat1: number, lon1: number, lat2: number, lon2: num
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
@@ -243,8 +246,8 @@ export default function RedeSaude() {
                 classif.tipo === 'hospital'
                   ? 'Pronto Atendimento Mapeado Vitta'
                   : classif.tipo === 'farmacia'
-                  ? 'Farmácia Verificada na Região'
-                  : undefined,
+                    ? 'Farmácia Verificada na Região'
+                    : undefined,
               lat: cLat,
               lng: cLng,
             });
@@ -990,21 +993,21 @@ export default function RedeSaude() {
               justifyContent: 'space-between',
               alignItems: isMobile ? 'stretch' : 'center',
               marginBottom: 12,
-              gap: 10,
+              gap: 16,
             }}
           >
             <View>
               <Text style={[isMobile ? tipografia.h3 : tipografia.h2, { color: theme.textPrimary }]}>
-             Mapa de Saúde
+                Mapa de Saúde
               </Text>
               <Text style={[tipografia.caption, { color: theme.textSecondary, marginTop: 2 }]} numberOfLines={1}>
-                Ponto de partida: <Text style={{ color: theme.yellow6, fontWeight: '700' }}>{origemAtual.nome}</Text>
+                Ponto de partida: <Text style={{ color: theme.yellow6, fontWeight: '600' }}>{origemAtual.nome}</Text>
               </Text>
             </View>
 
             {/* Linha de botões de Ação Rápida */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-              <TouchableOpacity
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              {/*<TouchableOpacity
                 activeOpacity={0.85}
                 onPress={acionarEmergenciaHospitalMaisProximo}
                 style={{
@@ -1013,20 +1016,24 @@ export default function RedeSaude() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: 8,
-                  backgroundColor: theme.delete || '#C31F1F',
+                  backgroundColor: theme.yellow5,
                   paddingVertical: 10,
                   paddingHorizontal: 14,
                   borderRadius: 999,
-                  
+
                 }}
               >
                 <Image source={emergencia} style={{ width: 16, height: 16, tintColor: '#FFFFFF' }} resizeMode="contain" />
-                <Text style={[tipografia.body, { color: '#FFFFFF',}]}>
+                <Text style={[tipografia.body, { color: '#FFFFFF', }]}>
                   {isMobile ? 'SOS Hospital' : 'Hospital mais próximo'}
                 </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
+              </TouchableOpacity>*/}
+              <ButtonPrimary
+                texto={isMobile ? 'SOS Hospital' : 'Hospital mais próximo'}
+                onPress={acionarEmergenciaHospitalMaisProximo}
+                icone={require('@/img/icons/hospital.svg')}
+              ></ButtonPrimary>
+              {/*<TouchableOpacity
                 activeOpacity={0.8}
                 onPress={obterMinhaLocalizacaoReal}
                 style={{
@@ -1047,12 +1054,16 @@ export default function RedeSaude() {
                 ) : (
                   <Image source={updateGps} style={{ width: 16, height: 16, tintColor: theme.black }} resizeMode="contain" />
                 )}
-                <Text style={[tipografia.body, { color: theme.textPrimary,}]}>
+                <Text style={[tipografia.body, { color: theme.textPrimary, }]}>
                   Meu GPS
                 </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
+              </TouchableOpacity>*/}
+              <ButtonSecondary
+                texto='Meu GPS'
+                onPress={obterMinhaLocalizacaoReal}
+                icone={require('@/img/icons/gps-01.svg')}
+              ></ButtonSecondary>
+              {/*<TouchableOpacity
                 activeOpacity={0.8}
                 onPress={() => setEditandoOrigem(!editandoOrigem)}
                 style={{
@@ -1068,11 +1079,16 @@ export default function RedeSaude() {
                   borderColor: theme.yellow5,
                 }}
               >
-                <Image source={pontoPartida} style={{ width: 14, height: 14, tintColor: theme.yellow6 }} resizeMode="contain" />
+                <Image source={pontoPartida} style={{ width: 24, height: 24, tintColor: theme.yellow6 }} resizeMode="contain" />
                 <Text style={[tipografia.body, { color: theme.yellow6, }]}>
                   {isMobile ? 'Mudar' : 'Mudar Ponto'}
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity>*/}
+              <ButtonSecondary
+                texto={isMobile ? 'Mudar' : 'Mudar Ponto'}
+                onPress={() => setEditandoOrigem(!editandoOrigem)}
+                icone={require('@/img/icons/pontoPartida.svg')}
+              ></ButtonSecondary>
             </View>
           </View>
 
@@ -1204,13 +1220,13 @@ export default function RedeSaude() {
                   { flex: isDesktop ? 1.05 : undefined, width: isDesktop ? undefined : '100%' },
                 ]}
               >
-                <View style={[styles.cardPainelBusca, { padding: isMobile ? 12 : 14 }]}>
+                <View style={[styles.cardPainelBusca, { paddingVertical: 32, paddingHorizontal: 24 }]}>
                   <View style={styles.inputBuscaContainer}>
                     <Image source={lupaPesquisa} style={{ width: 17, height: 17, tintColor: theme.gray4 }} resizeMode="contain" />
                     <TextInput
                       value={busca}
                       onChangeText={setBusca}
-                      placeholder="Buscar hospital, UBS, farmácia, Boa..."
+                      placeholder="Buscar Hospital, UBS, Farmácia..."
                       placeholderTextColor={theme.gray4}
                       style={styles.inputBusca}
                     />
@@ -1218,7 +1234,7 @@ export default function RedeSaude() {
                       <ActivityIndicator size="small" color={theme.yellow5} />
                     ) : busca.length > 0 ? (
                       <TouchableOpacity onPress={() => setBusca('')}>
-                        <Text style={{ color: theme.textSecondary, fontWeight: '700', paddingHorizontal: 6 }}>✕</Text>
+                        <Text style={{ color: theme.textSecondary, paddingHorizontal: 8 }}>✕</Text>
                       </TouchableOpacity>
                     ) : null}
                   </View>
@@ -1237,7 +1253,7 @@ export default function RedeSaude() {
                     ].map((chip) => {
                       const ativo = filtroTipo === chip.id;
                       const corIcone = ativo
-                        ? isDark ? '#000000' : '#FFFFFF'
+                        ? isDark ? '#000000' : theme.yellow9
                         : theme.textSecondary;
 
                       return (
@@ -1247,13 +1263,13 @@ export default function RedeSaude() {
                           style={[
                             styles.chipFiltro,
                             ativo && [styles.chipFiltroAtivo, { backgroundColor: theme.yellow5 }],
-                            { backgroundColor: ativo ? theme.yellow5 : theme.cardBg, flexDirection: 'row', alignItems: 'center', gap: 5 },
+                            { backgroundColor: ativo ? theme.yellow5 : theme.cardBg, flexDirection: 'row', alignItems: 'center', gap: 8 },
                           ]}
                         >
                           {chip.icone && (
                             <Image
                               source={chip.icone}
-                              style={{ width: 15, height: 15, tintColor: corIcone }}
+                              style={{ width: 24, height: 24, tintColor: corIcone }}
                               resizeMode="contain"
                             />
                           )}
@@ -1261,9 +1277,8 @@ export default function RedeSaude() {
                             style={[
                               tipografia.caption,
                               {
-                                color: ativo ? (isDark ? '#000000' : '#FFFFFF') : theme.textSecondary,
-                                fontWeight: ativo ? '600' : '400',
-                                fontSize: 12,
+                                color: ativo ? (isDark ? '#000000' : theme.yellow9) : theme.textSecondary,
+
                               },
                             ]}
                           >
@@ -1281,24 +1296,24 @@ export default function RedeSaude() {
                     >
                       <View
                         style={{
-                          width: 17,
-                          height: 17,
-                          borderRadius: 4,
-                          borderWidth: 1.5,
+                          width: 24,
+                          height: 24,
+                          borderRadius: 8,
+                          borderWidth: 1,
                           borderColor: apenas24h ? theme.yellow5 : theme.border,
                           backgroundColor: apenas24h ? theme.yellow5 : 'transparent',
                           alignItems: 'center',
                           justifyContent: 'center',
                         }}
                       >
-                        {apenas24h && <Text style={{ color: isDark ? '#000' : '#FFF', fontSize: 10, fontWeight: '800' }}>✓</Text>}
+                        {apenas24h && <Image source={require('@/img/icons/check.svg')} style={{ tintColor: theme.yellow9 }}></Image>}
                       </View>
-                      <Text style={[tipografia.caption, { color: theme.textPrimary, fontWeight: '500', fontSize: 12 }]}>
+                      <Text style={[tipografia.caption, { color: theme.textPrimary }]}>
                         Plantão 24h
                       </Text>
                     </TouchableOpacity>
 
-                    <Text style={[tipografia.caption, { fontWeight: '700', color: theme.textSecondary, fontSize: 11 }]}>
+                    <Text style={[tipografia.caption, { color: theme.textSecondary, }]}>
                       {carregandoRegiao ? 'Carregando...' : `${pontosFiltrados.length} encontrados`}
                     </Text>
                   </View>
@@ -1306,7 +1321,7 @@ export default function RedeSaude() {
 
                 {/* Lista dos Cards */}
                 <ScrollView
-                  style={{ maxHeight: isDesktop ? 580 : undefined }}
+                  style={{ maxHeight: isDesktop ? 680 : undefined }}
                   contentContainerStyle={{ gap: 8, paddingBottom: 10 }}
                   showsVerticalScrollIndicator={false}
                 >
@@ -1324,41 +1339,41 @@ export default function RedeSaude() {
                         }}
                         style={[
                           styles.cardLocal,
-                          { padding: 12, gap: 6 },
+                          { paddingHorizontal: 24, paddingVertical: 32, gap: 8 },
                           selecionado && [
-                            styles.cardLocalSelecionado,
-                            { borderColor: theme.yellow5, backgroundColor: theme.yellow1 },
+
+                            { borderColor: theme.yellow5, },
                           ],
                         ]}
                       >
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <View style={{ flex: 1, paddingRight: 6 }}>
-                            <Text style={[tipografia.body, { fontWeight: '700', color: theme.textPrimary, fontSize: 14 }]}>
+                          <View style={{ flex: 1, gap: 8 }}>
+                            <Text style={[tipografia.body,]}>
                               {item.nome}
                             </Text>
 
-                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 }}>
-                              <Text style={{ color: '#F59E0B', fontWeight: '700', fontSize: 12 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 }}>
+                              <Text style={[tipografia.bodySecondary, { color: theme.yellow5 }]}>
                                 {item.avaliacao.toFixed(1)} ★
                               </Text>
-                              <Text style={[tipografia.caption, { color: theme.textSecondary, fontSize: 11 }]}>
+                              <Text style={[tipografia.caption, { color: theme.textSecondary, }]}>
                                 ({item.totalAvaliacoes})
                               </Text>
                               {item.tipo === 'hospital' && (
-                                <View style={{ backgroundColor: '#FEE2E2', paddingHorizontal: 6, paddingVertical: 1, borderRadius: 999 }}>
-                                  <Text style={{ color: '#991B1B', fontSize: 9, fontWeight: '800' }}>URGÊNCIA</Text>
+                                <View style={{ backgroundColor: '#FEE2E2', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}>
+                                  <Text style={[tipografia.caption, { color: '#991B1B' }]}>Urgência</Text>
                                 </View>
                               )}
                             </View>
 
-                            <Text style={[tipografia.caption, { color: theme.textSecondary, marginTop: 1, fontSize: 11 }]}>
+                            <Text style={[tipografia.caption, { color: theme.textSecondary, marginTop: 1, }]}>
                               {item.categoriaTexto}
                             </Text>
-                            <Text style={[tipografia.caption, { color: theme.textSecondary, fontSize: 11 }]} numberOfLines={1}>
+                            <Text style={[tipografia.caption, { color: theme.textSecondary, }]} numberOfLines={1}>
                               {item.endereco}
                             </Text>
 
-                            <Text style={{ color: item.aberto24h ? '#10B981' : '#F59E0B', fontWeight: '700', fontSize: 11, marginTop: 2 }}>
+                            <Text style={[tipografia.caption, { color: item.aberto24h ? '#10B981' : '#F59E0B', backgroundColor: item.aberto24h ? '#eefff9' : '#fff6e6', marginTop: 2, width: '50%', padding: 8, borderRadius: 999, textAlign: 'center' }]}>
                               {item.horarioTexto}
                             </Text>
                           </View>
@@ -1373,15 +1388,17 @@ export default function RedeSaude() {
                               paddingHorizontal: 10,
                               height: 32,
                               borderRadius: 16,
-                              backgroundColor: theme.yellow5,
+                              //borderWidth: 1,
+                              //borderColor: selecionado ? theme.yellow5 : theme.border,
+                              backgroundColor: selecionado ? theme.black : theme.white,
                               alignItems: 'center',
                               justifyContent: 'center',
                               flexDirection: 'row',
-                              gap: 4,
+                              gap: 7,
                             }}
                           >
-                            <Image source={maps} style={{ width: 12, height: 12, tintColor: isDark ? '#000' : '#FFF' }} resizeMode="contain" />
-                            <Text style={{ fontSize: 11, fontWeight: '700', color: isDark ? '#000' : '#FFF' }}>
+                            <Image source={require('@/img/icons/route-02.svg')} style={{ width: 16, height: 16, tintColor: selecionado ? theme.white : theme.black }} resizeMode="contain" />
+                            <Text style={[tipografia.caption, { color: selecionado ? theme.white : theme.black }]}>
                               Rotas
                             </Text>
                           </TouchableOpacity>
@@ -1389,21 +1406,21 @@ export default function RedeSaude() {
 
                         <View
                           style={{
-                            borderTopWidth: 1,
-                            borderTopColor: theme.border,
+                            //borderTopWidth: 1,
+                            //borderTopColor: theme.border,
                             paddingTop: 5,
                             flexDirection: 'row',
                             justifyContent: 'space-between',
                             alignItems: 'center',
                           }}
                         >
-                          <Text style={[tipografia.caption, { fontWeight: '700', color: theme.textPrimary, fontSize: 11 }]}>
+                          <Text style={[tipografia.caption,]}>
                             {item.distanciaFormatada} • {item.tempoEstimado}
                           </Text>
                           {item.telefone && item.telefone !== '(Consulte no local)' && (
-                            <TouchableOpacity onPress={() => discarTelefone(item.telefone)} style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
-                              <Image source={telefone} style={{ width: 11, height: 11, tintColor: theme.yellow6 }} resizeMode="contain" />
-                              <Text style={[tipografia.caption, { color: theme.yellow6, fontWeight: '700', fontSize: 11 }]}>
+                            <TouchableOpacity onPress={() => discarTelefone(item.telefone)} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                              <Image source={require('@/img/icons/calling.svg')} style={{ width: 16, height: 16 }} resizeMode="contain" />
+                              <Text style={[tipografia.caption,]}>
                                 Ligar
                               </Text>
                             </TouchableOpacity>
@@ -1436,16 +1453,17 @@ export default function RedeSaude() {
                       flexDirection: 'column',
                       alignItems: 'stretch',
                       gap: 8,
-                      padding: isMobile ? 10 : 14,
+                      paddingVertical: 24,
+                      paddingHorizontal: 32,
                     },
                   ]}
                 >
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 4 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
                       {[
                         { id: 'carro', icone: carro, label: 'Carro' },
-                        { id: 'moto', icone: moto, label: 'Moto' },
-                        { id: 'bicicleta', icone: bike, label: 'Bike' },
+                        { id: 'moto', icone: moto, label: 'Motocicleta' },
+                        { id: 'bicicleta', icone: bike, label: 'Bicicleta' },
                         { id: 'pe', icone: andando, label: 'A pé' },
                       ].map((item) => {
                         const ativo = modoTransporte === item.id;
@@ -1459,17 +1477,16 @@ export default function RedeSaude() {
                             onPress={() => setModoTransporte(item.id as ModoTransporte)}
                             style={[
                               styles.seletorModoBtn,
-                              ativo && { backgroundColor: theme.yellow5 },
-                              { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6 },
+                              ativo && { backgroundColor: theme.black },
+                              { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 8 },
                             ]}
                           >
-                            <Image source={item.icone} style={{ width: 13, height: 13, tintColor: corIcone }} resizeMode="contain" />
+                            <Image source={item.icone} style={{ width: 24, height: 24, tintColor: corIcone }} resizeMode="contain" />
                             <Text
-                              style={{
-                                fontSize: 11,
-                                fontWeight: '600',
-                                color: ativo ? (isDark ? '#000' : '#FFF') : theme.textSecondary,
-                              }}
+                              style={[tipografia.body, {
+
+                                color: ativo ? isDark ? theme.black : theme.white : theme.textSecondary,
+                              }]}
                             >
                               {item.label}
                             </Text>
@@ -1485,22 +1502,22 @@ export default function RedeSaude() {
                           styles.seletorModoBtn,
                           {
                             backgroundColor: theme.inputBg,
-                            borderWidth: 1,
-                            borderColor: theme.border,
+                            //borderWidth: 1,
+                            //borderColor: theme.border,
                             flexDirection: 'row',
                             alignItems: 'center',
-                            gap: 4,
-                            paddingHorizontal: 8,
-                            paddingVertical: 6,
+                            gap: 8,
+                            paddingHorizontal: 16,
+                            paddingVertical: 8,
                           },
                         ]}
                       >
                         <Image
                           source={tipoCamada === 'satelite' ? satelite : mapaRua}
-                          style={{ width: 13, height: 13, tintColor: theme.yellow6 }}
+                          style={{ width: 24, height: 24, tintColor: theme.gray4 }}
                           resizeMode="contain"
                         />
-                        <Text style={{ fontSize: 11, fontWeight: '700', color: theme.textPrimary }}>
+                        <Text style={[tipografia.bodySecondary,]}>
                           {tipoCamada === 'satelite' ? 'Satélite' : 'Ruas'}
                         </Text>
                       </TouchableOpacity>
@@ -1510,15 +1527,19 @@ export default function RedeSaude() {
                         onPress={() => setMapaExpandido(true)}
                         style={{
                           backgroundColor: theme.inputBg,
-                          paddingHorizontal: 10,
-                          paddingVertical: 6,
+                          paddingHorizontal: 16,
+                          paddingVertical: 8,
                           borderRadius: 999,
-                          borderWidth: 1,
-                          borderColor: theme.border,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 8
+                          //borderWidth: 1,
+                          //borderColor: theme.border,
                         }}
                       >
-                        <Text style={{ fontSize: 11, fontWeight: '700', color: theme.textPrimary }}>
-                          ⛶ Tela Cheia
+                        <Image source={require('@/img/icons/telaCheia.svg')}></Image>
+                        <Text style={[tipografia.bodySecondary,]}>
+                          Tela Cheia
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -1540,7 +1561,7 @@ export default function RedeSaude() {
                       style={{
                         width: '100%',
                         height: '100%',
-                        minHeight: isMobile ? 480 : 640,
+                        minHeight: isMobile ? 480 : 720,
                         border: 'none',
                       }}
                       srcDoc={htmlMapaGoogleTiles}
@@ -1572,9 +1593,9 @@ export default function RedeSaude() {
                       style={[
                         styles.cardFlutuanteRota,
                         {
-                          bottom: isMobile ? 10 : 16,
-                          left: isMobile ? 10 : 16,
-                          right: isMobile ? 10 : 16,
+                          bottom: isMobile ? 10 : 32,
+                          left: isMobile ? 10 : 24,
+                          right: isMobile ? 10 : 24,
                           padding: isMobile ? 12 : 16,
                         },
                       ]}
@@ -1588,8 +1609,8 @@ export default function RedeSaude() {
                         }}
                       >
                         <View style={{ flex: 1 }}>
-                          <Text style={[tipografia.caption, { color: theme.textSecondary, fontSize: 11 }]} numberOfLines={1}>
-                            Destino: <Text style={{ fontWeight: '700', color: theme.textPrimary }}>{localSelecionado.nome}</Text>
+                          <Text style={[tipografia.caption, { color: theme.textSecondary, }]} numberOfLines={1}>
+                            Destino: <Text style={{ fontWeight: '600', color: theme.textPrimary }}>{localSelecionado.nome}</Text>
                           </Text>
                           <Text style={[isMobile ? tipografia.h4 : tipografia.h3, { color: theme.textPrimary, marginTop: 1 }]} numberOfLines={1}>
                             {localSelecionado.tempoEstimado || '~3 min'}
@@ -1599,8 +1620,8 @@ export default function RedeSaude() {
                           </Text>
                         </View>
 
-                        <View style={{ flexDirection: 'row', gap: 6 }}>
-                          <TouchableOpacity
+                        <View style={{ flexDirection: 'row', gap: 8 }}>
+                          {/*<TouchableOpacity
                             onPress={() => setNavegacaoAtiva(!navegacaoAtiva)}
                             style={{
                               flex: isMobile ? 1 : undefined,
@@ -1622,26 +1643,20 @@ export default function RedeSaude() {
                             <Text style={{ color: isDark ? '#000' : '#FFF', fontWeight: '700', fontSize: 12 }}>
                               {navegacaoAtiva ? 'Ocultar Guia' : 'Passo a Passo'}
                             </Text>
-                          </TouchableOpacity>
+                          </TouchableOpacity>*/}
+                          <ButtonSecondary
+                            texto={navegacaoAtiva ? 'Ocultar Guia' : 'Passo a Passo'}
+                            onPress={() => setNavegacaoAtiva(!navegacaoAtiva)}
+                            icone={navegacaoAtiva ? require('@/img/icons/eye-off.svg') : require('@/img/icons/bussola.svg')}
+                          ></ButtonSecondary>
 
                           {isMobile && (
-                            <TouchableOpacity
+                            <ButtonSecondary
+                              texto='Ver lista'
                               onPress={() => setAbaMobile('lista')}
-                              style={{
-                                backgroundColor: theme.inputBg,
-                                borderWidth: 1,
-                                borderColor: theme.border,
-                                paddingHorizontal: 12,
-                                paddingVertical: 10,
-                                borderRadius: 12,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }}
-                            >
-                              <Text style={{ fontSize: 12, fontWeight: '700', color: theme.textPrimary }}>
-                                Ver Lista
-                              </Text>
-                            </TouchableOpacity>
+                              icone={require('@/img/icons/view.svg')}
+                            ></ButtonSecondary>
+
                           )}
                         </View>
                       </View>
@@ -1688,7 +1703,7 @@ export default function RedeSaude() {
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
-            //   backdropFilter: 'blur(10px)',
+              //   backdropFilter: 'blur(10px)',
               gap: 8,
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 4 },
