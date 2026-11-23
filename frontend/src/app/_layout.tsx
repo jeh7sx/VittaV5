@@ -155,6 +155,13 @@ const TITULOS_ROTAS: Record<string, string> = {
 };
 
 export default function RootLayout() {
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      document.documentElement.lang = 'pt-BR';
+      document.title = 'Vitta - Início';
+    }
+  }, []);
+
   return (
     <ThemeProvider>
       <GlobalAlertProvider>

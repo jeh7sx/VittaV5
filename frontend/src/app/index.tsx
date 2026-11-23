@@ -162,6 +162,7 @@ export default function Index() {
             elevation: 8,
           }}
           accessibilityLabel="Abrir menu"
+          accessibilityRole="button"
           activeOpacity={0.8}
         >
           <View style={{ gap: 5, width: 20 }}>
@@ -245,6 +246,7 @@ export default function Index() {
                       textAlign: isMobile || isTablet ? 'center' : 'left',
                     },
                   ]}
+                  accessibilityRole="header"
                 >
                   Organize sua rotina médica em{' '}
                   <Text style={tipografia.highlight}>um só lugar.</Text>
