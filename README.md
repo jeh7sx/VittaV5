@@ -1,172 +1,103 @@
-## 📌 Sobre o Projeto
+# Vitta — Organização da rotina oncológica pediátrica
 
-O **Vitta** é uma plataforma multiplataforma (Web, Mobile) desenvolvida para apoiar famílias, cuidadores e responsáveis na organização médica de crianças e adolescentes em tratamento Oncológico.
+<img src="design/logo-vitta.svg" alt="Logo do Vitta" width="180">
 
-A aplicação centraliza o controle de medicamentos prescritos, consultas clínicas, exames, histórico clínico e conta com a **Vitta IA**, uma assistente inteligente integrada para esclarecer dúvidas, prestar suporte e apoiar o cronograma familiar.
+[**Acessar o Vitta**](https://vittav5-frontend.vercel.app/)
 
-## ✨ Principais Funcionalidades
+## Descrição
 
-### 💊 Gestão Completa de Medicamentos
+O Vitta é um sistema web desenvolvido pelo Grupo 09 do curso Técnico em Informática para Internet integrado ao Ensino Médio da ETEC de Campo Limpo Paulista. O projeto auxilia pais e responsáveis a organizar a rotina de crianças e adolescentes em tratamento oncológico.
 
-* Registro de posologia, frequência configurável (horas, dias, semanas ou personalizada) e datas de início/término.
+Acompanhar consultas, exames, horários de medicamentos e documentos pode ser difícil quando essas informações ficam espalhadas. O Vitta reúne os registros em um painel por criança ou adolescente e apresenta os compromissos em um calendário.
 
-* Cálculo automático de horários futuros e previsão de doses.
+## Equipe
 
-* Registro visual de status da dose (*Tomado*, *Próximo*, *Atrasado* ou *Agendado*).
+| Integrante | Função no TCC |
+| --- | --- |
+| Daniel Barros de Oliveira | Coautor do projeto |
+| Jerry Leonardo Alves Das Flores | Coautor do projeto |
+| Matheus dos Santos Galvão Dias | Coautor do projeto |
 
-* Associação de clínicas, farmácias e hospitais via geolocalização.
+**Orientação** — Barbara Kathellen Andrade Porfirio e Thaynara Cristina Maia dos Santos.
 
-* Armazenamento de fotos de bulas e embalagens com visualizador integrado.
+## Funcionalidades
 
-### 🩺 Gestão Completa de Consultas e Exames
+- **Visão Geral** — indicadores de acompanhamento, filtros por período e próximos compromissos.
+- **Medicamentos** — registro e acompanhamento de horários, doses e situação dos itens cadastrados.
+- **Consultas e exames** — organização dos compromissos com data, horário, local e profissional.
+- **Calendário** — agenda que reúne medicamentos, consultas e exames por dia.
+- **Documentos** — organização de arquivos em pastas e busca de registros.
+- **Mapa de Saúde** — busca de hospitais, clínicas, UBS e farmácias.
+- **Perfis de crianças e adolescentes** — seleção do perfil associado aos registros da rotina.
+- **Vitta IA** — chat com os modos Assistente e Suporte. O fluxo de cadastro de exames por conversa está em validação na versão web.
 
-* Registro de titulo, descrição, data, horário.
+## Tecnologias utilizadas
 
-* Registro visual de status de Consultas/Exames.
+| Tecnologia | Versão | Uso |
+| --- | --- | --- |
+| TypeScript | 6.0.3 | Linguagem da aplicação |
+| React e React DOM | 19.2.3 | Interface e renderização web |
+| React Native | 0.85.3 | Componentes multiplataforma |
+| React Native Web | 0.21.2 | Adaptação da interface para o navegador |
+| Expo | SDK 56 (56.0.23) | Desenvolvimento e exportação |
+| Expo Router | 56.2.21 | Navegação |
+| Firebase JS SDK | 12.15.0 | Acesso ao Firebase, incluindo Authentication e Cloud Firestore |
+| Node.js | 24.3.0 ou superior na linha 24.x | Ambiente local de desenvolvimento |
+| Vercel | Serviço hospedado | Publicação da versão web |
 
-* Associação de clínicas, farmácias e hospitais via geolocalização.
+As versões das dependências seguem o `frontend/package-lock.json`. O requisito de Node.js segue a faixa 24.x aceita pelo React Native do projeto.
 
-* Armazenamento de fotos de Consultas/Exames com visualizador integrado.
+## Imagens do sistema
 
-### 📅 Calendário & Compromissos
+### Página inicial
 
-* Visão mensal e diária integrada da rotina médica.
+![Página inicial pública do Vitta com a apresentação do sistema e opções de acesso](design/telas/home.png)
 
-* Filtro por categorias (medicamentos, consultas e exames agendados).
+### Calendário
 
-* Notificações de compromissos para evitar esquecimentos.
+![Calendário com as categorias de medicamentos, consultas e exames e os compromissos do dia](design/telas/calendario.png)
 
-### 📁 Arquivo & Gestão de Documentos
+## Estrutura do repositório
 
-* Digitalização e armazenamento de receitas, laudos médicos e exames laboratoriais.
+| Caminho | Conteúdo |
+| --- | --- |
+| [`docs/`](docs/) | Trabalho escrito do Grupo 09 |
+| [`frontend/src/`](frontend/src/) | Código-fonte da aplicação Expo |
+| [`design/`](design/) | Logo, protótipos, diagramas e imagens das telas |
+| [`database/`](database/) | Documentação da estrutura de dados no Firebase |
 
-* Categorização em pastas estruturadas com compartilhamento rápido em PDF.
+## Como executar o projeto
 
-* Armazenamento de documentos importante como CPF e RG, tanto dos responsáveis quanto da criança ou adolescente.
+1. Instale o Git e uma versão do Node.js compatível com a tabela acima.
+2. Clone o repositório e entre na pasta do frontend.
 
-### 👶 Multi-Responsáveis & Perfil
+   ```bash
+   git clone https://github.com/jeh7sx/VittaV5.git
+   cd VittaV5/frontend
+   ```
 
-* Acompanhamento simultâneo do mesmo paciente por múltiplos responsáveis (pais, avós, babás).
+3. Instale as dependências.
 
-* Sincronização em tempo real das doses administradas entre dispositivos.
+   ```bash
+   npm ci
+   ```
 
-### 🤖 Vitta IA (Assistente Integrada)
+4. Inicie a versão web.
 
-* Resumo prático de relatórios médicos e termos técnicos complexos.
+   ```bash
+   npm run web
+   ```
 
-* Esclarecimento de dúvidas sobre receitas e horários de posologia.
+5. Abra o endereço mostrado no terminal. Para experimentar a versão publicada, acesse [Vitta online](https://vittav5-frontend.vercel.app/).
 
-* Modal de teste e demonstração interativo acessível inclusive na página institucional aberta.
+Para exportar a versão web, execute `npm run build` dentro de `frontend/`. A saída é gerada em `frontend/dist/`.
 
-* Suporte completo do Vitta, ajuda responsáveis a tirar dúvidas e aprender mais sobre o tipo de câncer da criança ou adolescente.
+## Como citar o projeto
 
-## 🎨 UI/UX & Padrões de Design
+OLIVEIRA, Daniel Barros de; FLORES, Jerry Leonardo Alves Das; DIAS, Matheus dos Santos Galvão. **Desenvolvimento de um sistema web para organização de procedimentos médicos por pais e responsáveis de crianças e adolescentes em tratamento oncológico**. 2026. Trabalho de Conclusão de Curso (Técnico em Informática para Internet integrado ao Ensino Médio) — ETEC de Campo Limpo Paulista, Campo Limpo Paulista, 2026.
 
-* **Responsividade Multi-Dispositivo:** Telas, carrosséis e modais contam com larguras dinâmicas (`useWindowDimensions`), garantindo que em monitores grandes os cards permaneçam centralizados com `maxWidth` controlado e rolagem interna, e adaptando-se sem quebra para tablets e telas móveis.
+[Consultar o trabalho escrito](docs/grupo09_EntregaFinal.docx)
 
-* **Micro-interações Suaves:** Animações nativas de escala e elevação no hover (`onHoverIn` / `onHoverOut` via `Animated.View`), unificando botões primários (`ButtonPrimary`), secundários (`ButtonSecondary`), pretos e brancos.
+## Contato
 
-* **Tematização Centralizada:** Cores semânticas gerenciadas por `ThemeContext` e escala tipográfica padronizada (`tipografia.ts`).
-
-## 🛠️ Tecnologias Utilizadas
-
-* **Framework Principal:** [React Native](https://reactnative.dev/) com [Expo (SDK 56)](https://expo.dev/)
-
-* **Navegação & Roteamento:** [Expo Router](https://docs.expo.dev/router/introduction/) (arquitetura baseada em pastas)
-
-* **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
-
-* **Backend & Autenticação:** [Firebase](https://firebase.google.com/) (Auth, Firestore e Storage)
-
-* **Ícones & Vetores:** SVG integrado via `react-native-svg` e componentes vetoriais customizados
-
-* **Fontes:** Google Fonts (`@expo-google-fonts/inter`)
-
-* **Deploy Web:** [Vercel](https://vercel.com/) / Expo Web Export
-
-* **Apis:** [Gemini 3.5 Flash Lite](https://gemini.google.com/app?hl=pt-BR) / [Google Maps](https://www.google.com/maps/)
-
-## 📂 Estrutura de Pastas
-
-```
-├── src/
-│   ├── app/                    # Rotas e páginas (Expo Router)
-│   │   ├── (admin)/            # Rotas autenticadas do administrador
-│   │   ├── (auth)/             # Rotas para autenticação
-│   │   ├── (user)/             # Rotas autenticadas do usuário
-│   │   │   ├── medicamentos.tsx # Painel e modais de medicamentos
-│   │   │   ├── calendario.tsx  # Agenda e compromissos
-│   │   │   └── ...
-│   │   ├── _layout.tsx         # Configuração do Stack e Providers
-│   │   ├── index.tsx           # Landing page / Home pública
-│   │   └── recursos.tsx        # Página pública institucional (Saiba Mais)
-│   ├── components/             # Componentes reutilizáveis
-│   │   ├── Buttons/            # ButtonPrimary, ButtonSecondary, ButtonWhite, ButtonBlack
-│   │   ├── Modal/              # Modais de sucesso, visualização de fotos, etc.
-│   │   ├── PublicNavbar.tsx    # Navbar de navegação pública
-│   │   └── VittaIADemoModal.tsx # Demonstração da IA
-│   ├── context/                # Contextos globais (ThemeContext, FilhoContext)
-│   ├── controllers/            # Controladores de regras de negócio (hooks customizados)
-│   ├── hooks/                  # Utilitários de lógica e estado
-│   ├── img/                    # Ícones SVG, ilustrações e capturas do app
-│   └── styles/                 # Cores globais (colors.ts), tipografia (tipografia.ts) e temas (themes.ts)
-├── app.json                    # Metadados e configuração da build Expo
-├── package.json
-└── tsconfig.json
-
-```
-
-## 🚀 Como Executar o Projeto Localmente
-
-### Pré-requisitos
-
-* Node.js (versão 18 ou superior)
-
-* Gerenciador de pacotes `npm`
-
-* Expo Go instalado no smartphone (opcional para testes móveis)
-
-### 1. Clonar o repositório
-
-```
-git clone https://github.com/seu-usuario/vitta.git
-cd vitta
-
-```
-
-### 2. Instalar dependências
-
-```
-npm install
-
-```
-
-### 3. Executar o servidor de desenvolvimento
-
-```
-npx expo start ou npm run web 
-
-```
-
-* **Pressione `w`** para abrir no navegador (modo Web).
-
-* **Pressione `a`** para emulador Android ou **`i`** para simulador iOS.
-
-* Escaneie o QR Code no app **Expo Go** no dispositivo físico.
-
-## 📦 Build e Exportação Web (Vercel)
-
-Para compilar a versão web para produção estática:
-
-```
-npm run build
-
-```
-
-## 📄 Licença e Créditos
-
-Projeto elaborado pelos autores do Vitta.
-
-Contato para suporte e dúvidas: https://www.instagram.com/jeh7.sx/  &  https://www.instagram.com/\_oliveiral\_/
-
-Link da Versão Web: [httpsvittav5-frontend.vercel.app](https://vittav5-frontend.vercel.app/)
+[vittaetec@gmail.com](mailto:vittaetec@gmail.com)
